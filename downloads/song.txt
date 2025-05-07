@@ -1,0 +1,2640 @@
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+Search field
+Search...
+     ❯   HTML CSS JAVASCRIPT SQL PYTHON JAVA PHP HOW TO W3.CSS C C++ C# BOOTSTRAP REACT MYSQL JQUERY EXCEL XML DJANGO NUMPY PANDAS NODEJS DSA TYPESCRIPT ANGULAR GIT POSTGRESQL MONGODB ASP AI R GO KOTLIN SASS VUE GEN AI SCIPY CYBERSECURITY DATA SCIENCE INTRO TO PROGRAMMING 
+C Tutorial
+C HOME
+C Intro
+C Get Started
+C Syntax
+C Output
+C Comments
+C Variables
+C Data Types
+C Constants
+C Operators
+C Booleans
+C If...Else
+C Switch
+C While Loop
+C For Loop
+C Break/Continue
+C Arrays
+C Strings
+C User Input
+C Memory Address
+C Pointers
+
+C Functions
+C Functions
+C Function Parameters
+C Scope
+C Function Declaration
+C Recursion
+C Math Functions
+
+C Files
+C Create Files
+C Write To Files
+C Read Files
+
+C Structures
+C Structures
+
+C Enums
+C Enums
+
+C Memory
+C Memory Management
+
+C Reference
+C Reference
+C Keywords
+C <stdio.h>
+C <stdlib.h>
+C <string.h>
+C <math.h>
+C <ctype.h>
+
+C Examples
+C Examples
+C Real-Life Examples
+C Exercises
+C Quiz
+C Compiler
+C Syllabus
+C Study Plan
+C Certificate
+
+
+
+C string strstr() function
+
+Example
+Get a pointer to the first occurrence of a string in another string:
+
+char myStr[] = "The rain in Spain falls mainly on the plains";
+char *myPtr = strstr(myStr, "ain");
+if (myPtr != NULL) {
+  printf("%s", myPtr);
+}
+Definition and Usage
+The strstr() function returns a pointer to the position of the first occurrence of a string in another string.
+
+The strstr() function is defined in the <string.h> header file.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
+
+Syntax
+strchr(char * str, char * substring);
+Parameter Values
+Parameter	Description
+str	Required. A pointer to the string being searched.
+substring	Required. The string to search for.
+Technical Details
+Returns:	A char type pointer to the position in the string where the substring was found or NULL if the substring was not found.
+
+Related Pages
+C Strings Tutorial
+
+C String Functions Tutorial
+
+ 
+Track your progress - it's free!
+ 
+
+Get Certified
+COLOR PICKER
+colorpicker
+    
+PLUSSPACESGET CERTIFIEDFOR TEACHERSFOR BUSINESSCONTACT US
+Top Tutorials
+HTML Tutorial
+CSS Tutorial
+JavaScript Tutorial
+How To Tutorial
+SQL Tutorial
+Python Tutorial
+W3.CSS Tutorial
+Bootstrap Tutorial
+PHP Tutorial
+Java Tutorial
+C++ Tutorial
+jQuery Tutorial
+Top References
+HTML Reference
+CSS Reference
+JavaScript Reference
+SQL Reference
+Python Reference
+W3.CSS Reference
+Bootstrap Reference
+PHP Reference
+HTML Colors
+Java Reference
+Angular Reference
+jQuery Reference
+Top Examples
+HTML Examples
+CSS Examples
+JavaScript Examples
+How To Examples
+SQL Examples
+Python Examples
+W3.CSS Examples
+Bootstrap Examples
+PHP Examples
+Java Examples
+XML Examples
+jQuery Examples
+Get Certified
+HTML Certificate
+CSS Certificate
+JavaScript Certificate
+Front End Certificate
+SQL Certificate
+Python Certificate
+PHP Certificate
+jQuery Certificate
+Java Certificate
+C++ Certificate
+C# Certificate
+XML Certificate
+     FORUM ABOUT ACADEMY
+W3Schools is optimized for learning and training. Examples might be simplified to improve reading and learning.
+Tutorials, references, and examples are constantly reviewed to avoid errors, but we cannot warrant full correctness
+of all content. While using W3Schools, you agree to have read and accepted our terms of use, cookie and privacy policy.
+
+Copyright 1999-2025 by Refsnes Data. All Rights Reserved. W3Schools is Powered by W3.CSS.
