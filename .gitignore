@@ -1,0 +1,14 @@
+# Build artifacts
+*.o
+/bin/
+/obj/
+
+# Music files
+*.mp3
+/downloads/
+
+# Editor or OS files
+*~
+*.swp
+.DS_Store
+Thumbs.db
