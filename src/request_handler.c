@@ -1,5 +1,6 @@
 #include "request_handler.h"
 #include "network_utils.h"
+#include "login.h"
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -7,13 +8,35 @@
 #include <unistd.h>
 
 
-void handle_cmd(int client_fd, const char *command) {
-    if (strcasecmp(command, "LIST") == 0) {
+void handle_cmd(int client_fd, const char *command, int *logged_in) {
+      // Always allow LOGIN
+      if (strncasecmp(command, "LOGIN ", 6) == 0) {
+        *logged_in = handle_login(client_fd, command); // returns 1 if successful
+        return;
+    }
+
+    // Always allow LOGOUT
+    if (strcasecmp(command, "LOGOUT") == 0) {
+        *logged_in = 0;
+        send(client_fd, "You have been logged out.\n", 27, 0);
+        return;
+    }
+
+    // Block all other commands if not logged in
+    if (!*logged_in) {
+        send(client_fd, "ERROR: Please LOGIN first.\n", 28, 0);
+        return;
+    }
+
+  //other commands
+   if (strcasecmp(command, "LIST") == 0) {
         handle_list(client_fd);
     }
     else if (strncasecmp(command, "GET ", 4) == 0) {
-        handle_get(client_fd, command + 4); // filename follows "GET "
+        handle_get(client_fd, command + 4);
     }
+   
+  
 }
 
 void handle_list(int client_fd){
@@ -79,4 +102,24 @@ void handle_get (int client_fd, const char *filename) {
   //check
   printf("File was sent: %s\n", path);
   fclose(file);
+}
+
+int handle_login(int client_fd, const char *command) {
+  char username[64], password[64];
+
+  // Try to parse: LOGIN <username> <password>
+  if (sscanf(command + 6, "%63s %63s", username, password) != 2) {
+      send(client_fd, "ERROR: Invalid login format\n", 28, 0);
+      return 0;
+  }
+  printf("[DEBUG] LOGIN: user='%s', pass='%s'\n", username, password);
+
+
+  if (check_credentials(username, password)) {
+      send(client_fd, "LOGIN OK\n", 9, 0);
+      return 1;
+  } else {
+      send(client_fd, "LOGIN FAIL\n", 11, 0);
+      return 0;
+  }
 }

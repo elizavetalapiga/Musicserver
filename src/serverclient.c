@@ -1,5 +1,6 @@
 #include "network_utils.h"
 #include "recieve_handler.h"
+#include "login_client.h"
 
 #define PORT 8080
 #define IP_SERVER "127.0.0.1"
@@ -25,12 +26,19 @@ int main() {
 
   printf("Connected to the server\n");
 
+  // login
+  if (!client_login(sock_fd)) {
+    printf("Exiting due to failed login.\n");
+    close(sock_fd);
+    return 1;
+  }
 
+  // command sending
   while (1) {
     // clear the array
     memset(command, 0, sizeof(command));
 
-    printf("Enter the command: list, get <song_name>\n");
+    printf("Enter the command: list, get <song_name>, logout, login <user> <pass>\n");
     fgets(command, sizeof(command), stdin);
 
     // Remove newline character

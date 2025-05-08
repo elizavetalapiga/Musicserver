@@ -8,8 +8,8 @@ OBJ_DIR = obj
 BIN_DIR = bin
 
 # Object files
-CLIENT_OBJS = $(OBJ_DIR)/serverclient.o $(OBJ_DIR)/recieve_handler.o $(OBJ_DIR)/network_utils.o
-SERVER_OBJS = $(OBJ_DIR)/simpleserver.o $(OBJ_DIR)/request_handler.o $(OBJ_DIR)/network_utils.o
+CLIENT_OBJS = $(OBJ_DIR)/serverclient.o $(OBJ_DIR)/recieve_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login_client.o
+SERVER_OBJS = $(OBJ_DIR)/simpleserver.o $(OBJ_DIR)/request_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login.o
 
 # Default build: build both server and client
 all: $(BIN_DIR)/serverclient $(BIN_DIR)/simpleserver
@@ -37,6 +37,13 @@ $(OBJ_DIR)/request_handler.o: $(SRC_DIR)/request_handler.c include/request_handl
 
 $(OBJ_DIR)/network_utils.o: $(SRC_DIR)/network_utils.c include/network_utils.h
 	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/login_client.o: $(SRC_DIR)/login_client.c include/login_client.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/login.o: $(SRC_DIR)/login.c include/login.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
 
 # Clean build files
 clean:

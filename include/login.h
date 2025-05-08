@@ -1,0 +1,8 @@
+#ifndef LOGIN
+#define LOGIN
+
+int check_credentials(const char *username, const char *password);
+int handle_login(int client_fd, const char *command);
+
+
+#endif
