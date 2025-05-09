@@ -8,10 +8,10 @@
 #include <unistd.h>
 
 
-void handle_cmd(int client_fd, const char *command, int *logged_in) {
+void handle_cmd(int client_fd, const char *command, int *logged_in, const char *role){
       // Always allow LOGIN
       if (strncasecmp(command, "LOGIN ", 6) == 0) {
-        *logged_in = handle_login(client_fd, command); // returns 1 if successful
+        *logged_in = handle_login(client_fd, command, role); // returns 1 if successful
         return;
     }
 
@@ -35,6 +35,12 @@ void handle_cmd(int client_fd, const char *command, int *logged_in) {
     else if (strncasecmp(command, "GET ", 4) == 0) {
         handle_get(client_fd, command + 4);
     }
+    else if (strncasecmp(command, "ADD ", 4) == 0) {
+      handle_add(client_fd, command, role);
+      return;
+  }
+  
+  
    
   
 }
@@ -104,8 +110,10 @@ void handle_get (int client_fd, const char *filename) {
   fclose(file);
 }
 
-int handle_login(int client_fd, const char *command) {
+int handle_login(int client_fd, const char *command, *role_out) {
   char username[64], password[64];
+  char role[64] = "";
+  char response[64];
 
   // Try to parse: LOGIN <username> <password>
   if (sscanf(command + 6, "%63s %63s", username, password) != 2) {
@@ -115,11 +123,25 @@ int handle_login(int client_fd, const char *command) {
   printf("[DEBUG] LOGIN: user='%s', pass='%s'\n", username, password);
 
 
-  if (check_credentials(username, password)) {
-      send(client_fd, "LOGIN OK\n", 9, 0);
+  if (check_credentials(username, password, role)) {
+      strcpy(out_role, role); // passing role back to caller
+      
+      snprintf(response, sizeof(response), "LOGIN OK [%s]\n", role);
+      send(client_fd, response, strlen(response), 0);
+
+      printf("[DEBUG] Role = '%s'\n", role);
       return 1;
   } else {
       send(client_fd, "LOGIN FAIL\n", 11, 0);
       return 0;
   }
+}
+
+void handle_add(int client_fd, const char *command, const char *role) {
+  if (strcmp(role, "admin") != 0) {
+      send(client_fd, "ERROR: Admins only\n", 19, 0);
+      return;
+  }
+
+  // TODO: implement file receive and write
 }

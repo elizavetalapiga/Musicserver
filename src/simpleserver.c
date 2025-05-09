@@ -15,6 +15,9 @@ int main(){
   char command[512];
   int logged_in = 0;
   int opt = 1;
+  int logged_in = 0;
+  char role[64] = "";  // store role for this client
+
 
 
   // Server config
@@ -78,7 +81,7 @@ int main(){
         }
         command[bytes] = '\0';  // Null-terminate it
         printf("[DEBUG] Received command: '%s'\n", command);
-         handle_cmd(client_fd, command, &logged_in);
+         handle_cmd(client_fd, command, &logged_in, role);
         }
 
         close(client_fd);
