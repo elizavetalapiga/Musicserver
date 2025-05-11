@@ -16,8 +16,8 @@ int check_credentials(const char *username, const char *password, char *role_out
   while (fgets(line, sizeof(line), file)){
     line[strcspn(line, "\n")] = '\0';  // Remove trailing newline from fgets
 
-    char file_user[64], file_pass[64], role[64];
-        if (sscanf(line, "%63[^:]:%63[^:]:%63s", file_user, file_pass, role) == 3) { 
+    char file_user[64], file_pass[64], file_role[64];
+        if (sscanf(line, "%63[^:]:%63[^:]:%63s", file_user, file_pass, file_role) == 3) { 
           //sscanf parses line from the file. %63[^:] means read up to 63 characters and stop when it hits ":" 
           // and store it in file_user. Same for %63s. == 3 means the check that all value match the format and were extracted correctly
           

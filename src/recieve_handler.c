@@ -1,4 +1,5 @@
 #include "recieve_handler.h"
+#include "network_utils.h"
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -71,3 +72,44 @@ long received_total = 0;
     fclose(fp);
     printf("File received: %ld bytes\n", received_total);
 }
+
+void handle_snd_add(int sock_fd, const char *filename){
+  char path[512];
+  int response = 0; 
+  FILE *file;
+  long filesize;
+  char buffsndr[1024];
+  size_t reads_bytes;
+ 
+   
+  snprintf(path, sizeof(path), "client_music/%s", filename);
+ 
+
+  if ((file = fopen(path, "rb")) == NULL) {
+       handle_error("File opening failed");
+  }
+ 
+    //filesize collection ans sending in order to stop the loop on client side
+  fseek(file, 0, SEEK_END);
+  filesize = ftell(file);
+  rewind(file); //reset pointer to the begining of file
+  send(sock_fd, &filesize, sizeof(filesize), 0);
+
+
+  // Sending chunks + Error handeling
+  while ((reads_bytes = fread(buffsndr, 1, sizeof(buffsndr), file)) > 0){
+    if ((send(sock_fd, buffsndr, reads_bytes, 0)) == -1)
+      perror("Add failed");
+  }
+  printf("[DEBUG] Received response: %d\n", response);
+
+
+  if (recv(sock_fd, &response, sizeof(response), 0) > 0){
+    if (response == 1) {
+      printf("File was successfully added.\n");
+    } else  printf("Server reported file add failure.\n");
+  } else {
+    perror("Failed to receive server response");
+  }
+    fclose(file);   
+  }

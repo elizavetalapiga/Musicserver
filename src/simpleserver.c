@@ -15,7 +15,6 @@ int main(){
   char command[512];
   int logged_in = 0;
   int opt = 1;
-  int logged_in = 0;
   char role[64] = "";  // store role for this client
 
 

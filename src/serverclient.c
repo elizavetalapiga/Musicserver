@@ -9,8 +9,8 @@
 int main() {
   int sock_fd = 0;
   struct  sockaddr_in server_addr;
-  char command[512];
-
+  char command[512], filename[128];
+  
 
   // Create a socket + error handeling
   sock_fd = create_socket();
@@ -38,17 +38,24 @@ int main() {
     // clear the array
     memset(command, 0, sizeof(command));
 
-    printf("Enter the command: list, get <song_name>, logout, login <user> <pass>\n");
+    printf("Enter the command: list, get <song_name>, logout, login <user> <pass>\n, add <song_name>");
     fgets(command, sizeof(command), stdin);
 
     // Remove newline character
     command[strcspn(command,"\n")]= '\0';
 
-    // Sends messeges
+    // Sends commands
     if ((send(sock_fd , command, strlen(command), 0)) == -1){
       handle_error("Send failed");
       break;
     }
+
+    //add function call
+    if (strncasecmp(command, "ADD ", 4) == 0) {      
+      sscanf(command + 4, "%127s", filename);
+      handle_snd_add(sock_fd, filename);  
+  }
+
     printf("[DEBUG] Sent command: %s\n", command);
     handle_rcv(sock_fd, command);
 

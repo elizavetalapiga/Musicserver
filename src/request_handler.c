@@ -110,10 +110,11 @@ void handle_get (int client_fd, const char *filename) {
   fclose(file);
 }
 
-int handle_login(int client_fd, const char *command, *role_out) {
+int handle_login(int client_fd, const char *command, char *role_out) {
   char username[64], password[64];
   char role[64] = "";
-  char response[64];
+  char response[128];
+  
 
   // Try to parse: LOGIN <username> <password>
   if (sscanf(command + 6, "%63s %63s", username, password) != 2) {
@@ -124,7 +125,7 @@ int handle_login(int client_fd, const char *command, *role_out) {
 
 
   if (check_credentials(username, password, role)) {
-      strcpy(out_role, role); // passing role back to caller
+      strcpy(role_out, role); // passing role back to caller
       
       snprintf(response, sizeof(response), "LOGIN OK [%s]\n", role);
       send(client_fd, response, strlen(response), 0);
@@ -138,10 +139,61 @@ int handle_login(int client_fd, const char *command, *role_out) {
 }
 
 void handle_add(int client_fd, const char *command, const char *role) {
+  int respond;
+  char filename[128];
+  char filepath[256];
+  long filesize = 0;
+  char buffer[1024];
+  long received = 0;
+  int chunk;
+
+  //check for admin role
   if (strcmp(role, "admin") != 0) {
-      send(client_fd, "ERROR: Admins only\n", 19, 0);
+      respond = 0;
+      send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
 
-  // TODO: implement file receive and write
+  //check the song name absence and parsing the songname in variable
+  if (sscanf(command + 4, "%127s", filename) != 1) {
+      respond = 0;
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
+  }
+
+  //crafting the filepath
+  snprintf(filepath, sizeof(filepath), "music/%s", filename);
+
+  //creating file for writing
+  FILE *file = fopen(filepath, "wb");
+  if (file == NULL) {
+      respond = 0;
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
+  }
+
+  //reciving the filesize. Check for failed read or connection closed, and for invalid data
+  if (recv(client_fd, &filesize, sizeof(filesize), 0) <= 0 || filesize <= 0) {
+      fclose(file);
+      respond = 0;
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
+  }
+
+ //recieving file
+  while (received < filesize) {
+      chunk = recv(client_fd, buffer, sizeof(buffer), 0);
+      if (chunk <= 0) {
+        perror("Recieved failed");
+        break;
+      }
+      fwrite(buffer, 1, chunk, file);
+      received += chunk;
+  }
+
+  fclose(file);
+
+  // if received == filesize then respond=1 othewise 0;
+  respond = (received == filesize) ? 1 : 0;
+  send(client_fd, &respond, sizeof(respond), 0);
 }
