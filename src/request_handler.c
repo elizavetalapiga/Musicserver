@@ -37,12 +37,13 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, const char *
     }
     else if (strncasecmp(command, "ADD ", 4) == 0) {
       handle_add(client_fd, command, role);
-      return;
-  }
-  
-  
-   
-  
+     }
+    else if (strncasecmp(command, "DELETE ", 7) == 0) {
+      handle_delete(client_fd, command, role);
+     }
+    else {
+      send(client_fd, "ERROR: Unknown command\n", 24, 0);
+    }
 }
 
 void handle_list(int client_fd){
@@ -196,4 +197,34 @@ void handle_add(int client_fd, const char *command, const char *role) {
   // if received == filesize then respond=1 othewise 0;
   respond = (received == filesize) ? 1 : 0;
   send(client_fd, &respond, sizeof(respond), 0);
+}
+
+
+void handle_delete(int client_fd, const char *command, const char *role) {
+  int respond = 0;
+  char filename[128];
+  char filepath[256];
+  
+  //check for admin role
+  if (strcmp(role, "admin") != 0) {
+      respond = 0;
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
+  }
+
+  //check the song name absence and parsing the songname in variable
+  if (sscanf(command + 7, "%127s", filename) != 1) {
+      respond = 0;
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
+  }
+
+  //crafting the filepath
+  snprintf(filepath, sizeof(filepath), "music/%s", filename);
+  printf("[DEBUG] Trying to delete: %s\n", filepath);
+
+  //removing file, sending the respond
+  respond = (remove(filepath) == 0) ? 1 : 0;
+  send(client_fd, &respond, sizeof(respond), 0);
+  return;
 }

@@ -9,8 +9,11 @@ void handle_rcv(int sock_fd, const char *command) {
     if (strcasecmp(command, "LIST") == 0) {
         handle_rcv_list(sock_fd);
     }
-    else if (strncasecmp(command, "get ", 4) == 0) {
+    else if (strncasecmp(command, "GET ", 4) == 0) {
         handle_rcv_get(sock_fd, command + 4); // filename follows "GET "
+    }
+    else if (strncasecmp(command, "DELETE ", 7) == 0) {
+        handle_rcv_delete(sock_fd); 
     }
 }
 
@@ -108,8 +111,20 @@ void handle_snd_add(int sock_fd, const char *filename){
     if (response == 1) {
       printf("File was successfully added.\n");
     } else  printf("Server reported file add failure.\n");
-  } else {
-    perror("Failed to receive server response");
-  }
+  } 
     fclose(file);   
   }
+
+  void handle_rcv_delete(int sock_fd) {
+    int response = 0;
+
+    if (recv(sock_fd, &response, sizeof(response), 0) > 0) {
+        if (response == 1)
+            printf("File deleted successfully.\n");
+        else
+            printf("Delete failed: file not found or permission denied.\n");
+    } else {
+        perror("Failed to receive delete response");
+    }
+}
+   

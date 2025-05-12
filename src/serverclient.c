@@ -38,7 +38,7 @@ int main() {
     // clear the array
     memset(command, 0, sizeof(command));
 
-    printf("Enter the command: list, get <song_name>, logout, login <user> <pass>\n, add <song_name>");
+    printf("Enter the command: list, get <song_name>, logout, login <user> <pass>, add <song_name>, delete <song_name>\n");
     fgets(command, sizeof(command), stdin);
 
     // Remove newline character
@@ -54,7 +54,7 @@ int main() {
     if (strncasecmp(command, "ADD ", 4) == 0) {      
       sscanf(command + 4, "%127s", filename);
       handle_snd_add(sock_fd, filename);  
-  }
+    }
 
     printf("[DEBUG] Sent command: %s\n", command);
     handle_rcv(sock_fd, command);
