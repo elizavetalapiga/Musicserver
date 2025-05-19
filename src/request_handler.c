@@ -41,6 +41,10 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, const char *
     else if (strncasecmp(command, "DELETE ", 7) == 0) {
       handle_delete(client_fd, command, role);
      }
+    else if (strncasecmp(command, "RENAME ", 7) == 0) {
+      handle_rename(client_fd, command, role);
+      return;
+    } 
     else {
       send(client_fd, "ERROR: Unknown command\n", 24, 0);
     }
@@ -227,4 +231,39 @@ void handle_delete(int client_fd, const char *command, const char *role) {
   respond = (remove(filepath) == 0) ? 1 : 0;
   send(client_fd, &respond, sizeof(respond), 0);
   return;
+}
+
+void handle_rename(int client_fd, const char *command, const char *role) {
+int respond;
+FILE *file;
+char old_name [128], new_name [128], old_path [256], new_path [256];
+
+//check for admin role
+if (strcmp(role, "admin") != 0) {
+    respond = 0;
+    send(client_fd, &respond, sizeof(respond), 0);
+    return;
+}
+
+//check the song name absence and parsing the songname in variable
+if (sscanf(command + 7, "%127s %127s", old_name, new_name) != 2) {
+    respond = 0;
+    send(client_fd, &respond, sizeof(respond), 0);
+    return;
+}
+
+if ((file=fopen(old_name,"r")) != NULL){
+  respond = 1;
+  send(client_fd, &respond, sizeof(respond), 0);
+  return;
+}
+
+snprintf(old_path, sizeof(old_path), "music/%s", old_name);
+snprintf(new_path, sizeof(new_path), "music/%s", new_name);
+
+printf("[DEBUG] Rename: %s -> %s\n", old_path, new_path);
+
+
+respond = (rename(old_path, new_path) == 0) ? 1 : 0;
+send(client_fd, &respond, sizeof(respond), 0);
 }

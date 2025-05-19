@@ -15,6 +15,10 @@ void handle_rcv(int sock_fd, const char *command) {
     else if (strncasecmp(command, "DELETE ", 7) == 0) {
         handle_rcv_delete(sock_fd); 
     }
+    else if (strncasecmp(command, "RENAME ", 7) == 0) {
+      handle_rcv_rename(sock_fd);
+}
+
 }
 
 void handle_rcv_list(int sock_fd) {
@@ -127,4 +131,16 @@ void handle_snd_add(int sock_fd, const char *filename){
         perror("Failed to receive delete response");
     }
 }
-   
+
+
+void handle_rcv_rename(int sock_fd) {
+    int response = 0;
+    if (recv(sock_fd, &response, sizeof(response), 0) > 0) {
+        if (response == 1)
+            printf("Rename successful.\n");
+        else
+            printf("Rename failed: file not found or permission denied.\n");
+    } else {
+        perror("Failed to receive rename response");
+    }
+}

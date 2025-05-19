@@ -6,5 +6,6 @@ void handle_list(int client_fd);
 void handle_get(int client_fd, const char *filename);
 void handle_add(int client_fd, const char *command, const char *role);
 void handle_delete(int client_fd, const char *command, const char *role);
+void handle_rename(int client_fd, const char *command, const char *role);
 
 #endif

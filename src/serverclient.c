@@ -38,7 +38,7 @@ int main() {
     // clear the array
     memset(command, 0, sizeof(command));
 
-    printf("Enter the command: list, get <song_name>, logout, login <user> <pass>, add <song_name>, delete <song_name>\n");
+    printf("Enter the command: list, get <song_name>, logout, login <user> <pass>; For admin: add <song_name>, delete <song_name>, rename <song_name new_name>\n");
     fgets(command, sizeof(command), stdin);
 
     // Remove newline character
