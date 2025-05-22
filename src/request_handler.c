@@ -1,11 +1,15 @@
 #include "request_handler.h"
 #include "network_utils.h"
+#include "response_codes.h"
 #include "login.h"
 #include <string.h>
 #include <stdio.h>
+
 #include <dirent.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <arpa/inet.h>
+
 
 
 void handle_cmd(int client_fd, const char *command, int *logged_in, const char *role){
@@ -45,6 +49,10 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, const char *
       handle_rename(client_fd, command, role);
       return;
     } 
+    else if (strncasecmp(command, "CREATEUSER ", 11) == 0) {
+    handle_newuser(client_fd, command, role);
+    return;
+    }
     else {
       send(client_fd, "ERROR: Unknown command\n", 24, 0);
     }
@@ -53,10 +61,15 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, const char *
 void handle_list(int client_fd){
   DIR *dir = opendir("music/");
   char buffer[512];
+  int respond = 0;
   if (dir == NULL) {
     perror("opendir failed");
+    respond = ERR_FILE_OPEN_FAIL;
+    send(client_fd, &respond, sizeof(respond), 0);
     return;// exit the function
   }
+  respond = OK;
+  send(client_fd, &respond, sizeof(respond), 0);
 
   struct dirent *entry;
   while ((entry = readdir(dir)) != NULL) {
@@ -66,20 +79,22 @@ void handle_list(int client_fd){
     send(client_fd, buffer, strlen(buffer), 0);
   }
   send(client_fd, "END\n", 4, 0);
-
   closedir(dir);
 }
 
 void handle_get (int client_fd, const char *filename) {
-
-  // Trim newline, since const was passed we cannot change filename directly
+  char buffsndr[1024];
+  size_t reads_bytes;
   char local_filename[256];
+  char path[512];
+  int respond = 0;
+  long filesize = 0;
+  // Trim newline, since const was passed we cannot change filename directly
   strncpy(local_filename, filename, sizeof(local_filename));
   local_filename[sizeof(local_filename)-1] = '\0';  // safety null
   local_filename[strcspn(local_filename, "\n")] = '\0';
 
   //building the path
-  char path[512];
   memset(path, 0, sizeof(path));
   snprintf(path, sizeof(path), "music/%s", local_filename);
   printf("Trying to open file: %s\n", path);
@@ -87,28 +102,27 @@ void handle_get (int client_fd, const char *filename) {
   //checking if the file can be open. RB - Read in Binary Mode, required for mp3
   FILE *file;
   if ((file = fopen(path, "rb")) == NULL) {
-    //error reciving in case of non exsistance
-    long filesize = -1;
+    filesize = -1;
     send(client_fd, &filesize, sizeof(filesize), 0);
-
     handle_error("File opening failed");
   }
 
   //filesize collection ans sending in order to stop the loop on client side
   fseek(file, 0, SEEK_END);
-  long filesize = ftell(file);
+  filesize = ftell(file);
   rewind(file); //reset pointer to the begining of file
   send(client_fd, &filesize, sizeof(filesize), 0);
 
-  printf("[DEBUG] Sending filesize: %ld\n", filesize);
-
-  char buffsndr[1024];
-  size_t reads_bytes;
   // Sending chunks + Error handeling
   while ((reads_bytes = fread(buffsndr, 1, sizeof(buffsndr), file)) > 0){
-    if ((send(client_fd, buffsndr, reads_bytes, 0)) == -1)
-      perror("Send failed");
-
+    if ((send(client_fd, buffsndr, reads_bytes, 0)) == -1){
+      respond = ERR_GENERIC;
+    send(client_fd, &respond, sizeof(respond), 0);  
+    fclose(file);
+    perror("Send failed");
+    return;
+    }
+    
   }
   //check
   printf("File was sent: %s\n", path);
@@ -118,33 +132,30 @@ void handle_get (int client_fd, const char *filename) {
 int handle_login(int client_fd, const char *command, char *role_out) {
   char username[64], password[64];
   char role[64] = "";
-  char response[128];
+  int respond = 0;
   
 
   // Try to parse: LOGIN <username> <password>
   if (sscanf(command + 6, "%63s %63s", username, password) != 2) {
-      send(client_fd, "ERROR: Invalid login format\n", 28, 0);
+      respond = ERR_PARSE;
+      send(client_fd, &respond, sizeof(respond), 0);
       return 0;
   }
-  printf("[DEBUG] LOGIN: user='%s', pass='%s'\n", username, password);
-
-
+ 
   if (check_credentials(username, password, role)) {
       strcpy(role_out, role); // passing role back to caller
-      
-      snprintf(response, sizeof(response), "LOGIN OK [%s]\n", role);
-      send(client_fd, response, strlen(response), 0);
-
-      printf("[DEBUG] Role = '%s'\n", role);
+      respond = OK;
+      send(client_fd, &respond, sizeof(respond), 0);
       return 1;
   } else {
-      send(client_fd, "LOGIN FAIL\n", 11, 0);
+      respond = ERR_PERMISSION;
+      send(client_fd, &respond, sizeof(respond), 0);
       return 0;
   }
 }
 
 void handle_add(int client_fd, const char *command, const char *role) {
-  int respond;
+  int respond = 0;
   char filename[128];
   char filepath[256];
   long filesize = 0;
@@ -154,14 +165,14 @@ void handle_add(int client_fd, const char *command, const char *role) {
 
   //check for admin role
   if (strcmp(role, "admin") != 0) {
-      respond = 0;
+      respond = ERR_PERMISSION;
       send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
 
   //check the song name absence and parsing the songname in variable
   if (sscanf(command + 4, "%127s", filename) != 1) {
-      respond = 0;
+      respond = ERR_FILE_NOT_FOUND;
       send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
@@ -172,7 +183,7 @@ void handle_add(int client_fd, const char *command, const char *role) {
   //creating file for writing
   FILE *file = fopen(filepath, "wb");
   if (file == NULL) {
-      respond = 0;
+      respond = ERR_FILE_OPEN_FAIL;
       send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
@@ -180,7 +191,7 @@ void handle_add(int client_fd, const char *command, const char *role) {
   //reciving the filesize. Check for failed read or connection closed, and for invalid data
   if (recv(client_fd, &filesize, sizeof(filesize), 0) <= 0 || filesize <= 0) {
       fclose(file);
-      respond = 0;
+      respond = ERR_GENERIC;
       send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
@@ -198,8 +209,8 @@ void handle_add(int client_fd, const char *command, const char *role) {
 
   fclose(file);
 
-  // if received == filesize then respond=1 othewise 0;
-  respond = (received == filesize) ? 1 : 0;
+  // if received == filesize then respond=ok othewise error;
+  respond = (received == filesize) ? OK : ERR_INCOMPLETE_TRANSFER;
   send(client_fd, &respond, sizeof(respond), 0);
 }
 
@@ -211,7 +222,7 @@ void handle_delete(int client_fd, const char *command, const char *role) {
   
   //check for admin role
   if (strcmp(role, "admin") != 0) {
-      respond = 0;
+      respond = ERR_PERMISSION;
       send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
@@ -240,20 +251,20 @@ char old_name [128], new_name [128], old_path [256], new_path [256];
 
 //check for admin role
 if (strcmp(role, "admin") != 0) {
-    respond = 0;
+    respond = ERR_PERMISSION;
     send(client_fd, &respond, sizeof(respond), 0);
     return;
 }
 
 //check the song name absence and parsing the songname in variable
 if (sscanf(command + 7, "%127s %127s", old_name, new_name) != 2) {
-    respond = 0;
+    respond = ERR_GENERIC;
     send(client_fd, &respond, sizeof(respond), 0);
     return;
 }
 
 if ((file=fopen(old_name,"r")) != NULL){
-  respond = 1;
+  respond = ERR_FILE_OPEN_FAIL;
   send(client_fd, &respond, sizeof(respond), 0);
   return;
 }
@@ -264,6 +275,67 @@ snprintf(new_path, sizeof(new_path), "music/%s", new_name);
 printf("[DEBUG] Rename: %s -> %s\n", old_path, new_path);
 
 
-respond = (rename(old_path, new_path) == 0) ? 1 : 0;
+respond = (rename(old_path, new_path) == 0) ? OK : ERR_GENERIC;
 send(client_fd, &respond, sizeof(respond), 0);
+}
+
+
+void handle_newuser(int client_fd, const char *command, const char *role){
+int respond;
+FILE *file;
+char buffer [128], existing_user [64], username [64], password [64], new_role [64];
+printf("[DEBUG] Entered handle_newuser()\n");
+//check for admin role
+if (strcmp(role, "admin") != 0) {
+    respond = ERR_PERMISSION;
+    send(client_fd, &respond, sizeof(respond), 0);
+    return;
+}
+
+//check the credentials absence and parsing it in variables
+if (sscanf(command + 11, "%63s %63s %15s", username, password, new_role) != 3) {
+  respond = ERR_GENERIC;
+  send(client_fd, &respond, sizeof(respond), 0);
+  return;
+}
+printf("[DEBUG] cred chek abs passed()\n");
+new_role[strcspn(new_role, "\n")] = '\0';
+//check id the role is valid
+if (strncasecmp(new_role, "admin", 5) != 0 && strncasecmp(new_role, "user", 4)!= 0){
+  respond = ERR_INVALID_ROLE;
+  send(client_fd, &respond, sizeof(respond), 0);
+  return;
+}
+
+//check if user already exists
+if ((file=fopen("credentials.txt", "r")) == NULL){
+  respond = ERR_FILE_OPEN_FAIL;
+  send(client_fd, &respond, sizeof(respond), 0);
+  return;
+}
+
+while ((fgets(buffer, sizeof(buffer), file)) != NULL){
+  if (sscanf(buffer, "%63[^:]", existing_user) == 1 && strcmp(username, existing_user) == 0) {
+    fclose(file);
+    respond = ERR_FILE_OPEN_FAIL;
+    send(client_fd, &respond, sizeof(respond), 0);
+    return;
+  }
+}
+printf("[DEBUG] Creating user: %s %s %s\n", username, password, new_role);
+
+fclose(file);
+
+//adding user. "a": Open for appending.
+file = fopen("credentials.txt", "a");
+if (file == NULL){
+  respond = ERR_FILE_OPEN_FAIL;
+  send(client_fd, &respond, sizeof(respond), 0);
+  return;
+}
+fprintf(file, "%s:%s:%s\n", username, password, new_role);
+fclose(file);
+respond = OK;
+send(client_fd, &respond, sizeof(respond), 0);
+
 }

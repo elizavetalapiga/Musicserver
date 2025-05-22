@@ -1,4 +1,5 @@
 #include "recieve_handler.h"
+#include "response_codes.h"
 #include "network_utils.h"
 #include <string.h>
 #include <stdio.h>
@@ -17,14 +18,28 @@ void handle_rcv(int sock_fd, const char *command) {
     }
     else if (strncasecmp(command, "RENAME ", 7) == 0) {
       handle_rcv_rename(sock_fd);
-}
-
+    }
+    else if (strncasecmp(command, "CREATEUSER ", 11) == 0) {
+        handle_rcv_delete(sock_fd); 
+    }
+    
 }
 
 void handle_rcv_list(int sock_fd) {
   char buffer[512] = {0};
   size_t bytes_received;
   char *end_marker;
+  int respond = 0;
+
+  if (recv(sock_fd, &respond, sizeof(respond), 0) <= 0) {
+    perror("Failed to receive server response");
+    return;
+    }  
+  if (respond != OK) {
+    handle_response(respond);  // handle the specific error
+    return;  // Exit without entering the loop
+  }   
+
   while ((bytes_received = recv(sock_fd, buffer, sizeof(buffer) - 1, 0)) > 0){
     buffer[bytes_received] = '\0'; // Null-terminate to use printf
     end_marker = strstr(buffer, "END\n");
@@ -33,9 +48,12 @@ void handle_rcv_list(int sock_fd) {
       printf("%s", buffer);
       break;
     }
-
     printf("%s", buffer);
      }
+
+    if (bytes_received <= 0) {
+        perror("Error while receiving file list");
+    }
   }
 
 
@@ -50,12 +68,12 @@ long received_total = 0;
   //reciving filesize or error
   recv(sock_fd, &filesize, sizeof(filesize), 0);
   if (filesize == -1) {
-  printf("Server: File not found\n");
+  handle_response(ERR_FILE_NOT_FOUND);
   return;
   }
   printf("[DEBUG] Sending filesize: %ld\n", filesize);
   //building the path
-  snprintf(path, sizeof(path), "downloads/%s", filename);
+  snprintf(path, sizeof(path), "client_music/%s", filename);
 
   // opening directory
   FILE *fp = fopen(path, "wb");
@@ -112,23 +130,17 @@ void handle_snd_add(int sock_fd, const char *filename){
 
 
   if (recv(sock_fd, &response, sizeof(response), 0) > 0){
-    if (response == 1) {
-      printf("File was successfully added.\n");
-    } else  printf("Server reported file add failure.\n");
+   handle_response(response);
   } 
     fclose(file);   
   }
 
   void handle_rcv_delete(int sock_fd) {
     int response = 0;
-
     if (recv(sock_fd, &response, sizeof(response), 0) > 0) {
-        if (response == 1)
-            printf("File deleted successfully.\n");
-        else
-            printf("Delete failed: file not found or permission denied.\n");
+      handle_response(response);
     } else {
-        perror("Failed to receive delete response");
+        perror("Failed to receive response");
     }
 }
 
@@ -136,11 +148,49 @@ void handle_snd_add(int sock_fd, const char *filename){
 void handle_rcv_rename(int sock_fd) {
     int response = 0;
     if (recv(sock_fd, &response, sizeof(response), 0) > 0) {
-        if (response == 1)
-            printf("Rename successful.\n");
-        else
-            printf("Rename failed: file not found or permission denied.\n");
+        handle_response(response);
     } else {
-        perror("Failed to receive rename response");
+        perror("Failed to receive response");
     }
+}
+
+void handle_rcv_newuser(int sock_fd) {
+    int response = 0;
+    if (recv(sock_fd, &response, sizeof(response), 0) > 0) {
+        handle_response(response);
+    } else {
+        perror("Failed to receive response");
+    }
+}
+
+void handle_response(int response) {
+  switch (response) {
+    case OK:
+    printf("Success\n");
+    break;
+    case ERR_GENERIC:
+    printf("Error occured\n");
+    break;
+    case ERR_PERMISSION:
+    printf("Error: Permission denied\n");
+    break;
+    case ERR_FILE_NOT_FOUND:
+    printf("Error: File not found\n");
+    break;
+    case ERR_INVALID_ROLE:
+    printf("Error: Invalid role\n");
+    break;
+    case ERR_PARSE:
+    printf("Error: Command was not parsed\n");
+    break;
+    case ERR_USER_EXSISTS:
+    printf("Error: User is already exists\n");
+    break;
+    case ERR_FILE_OPEN_FAIL:
+    printf("Error: File open failed\n");
+    break;
+    case ERR_INCOMPLETE_TRANSFER:
+    printf("Error: Transfer of file failed\n");
+    break;
+  }
 }
