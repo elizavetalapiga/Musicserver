@@ -55,8 +55,11 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, const char *
     return;
     }
     else if (strncasecmp(command, "INFO ", 5) == 0) {
-      printf("[DEBUG] read_id3v1_tag() should be called\n");
     read_id3v1_tag(client_fd, command);
+    return;
+  }
+  else if (strncasecmp(command, "SEARCH ", 7) == 0) {
+    search_tag(client_fd, command);
     return;
   }
     else {

@@ -26,6 +26,9 @@ void handle_rcv(int sock_fd, const char *command) {
     else if (strncasecmp(command, "INFO ", 5) == 0) {
         handle_rcv_tag(sock_fd); 
     }
+    else if (strncasecmp(command, "SEARCH ", 7) == 0) {
+        handle_search_response(sock_fd); 
+    }
     
 }
 
@@ -52,7 +55,7 @@ void handle_rcv_list(int sock_fd) {
       printf("%s", buffer);
       break;
     }
-    printf("%s", buffer);
+    printf("%s\n", buffer);
      }
 
     if (bytes_received <= 0) {
@@ -130,7 +133,6 @@ void handle_snd_add(int sock_fd, const char *filename){
     if ((send(sock_fd, buffsndr, reads_bytes, 0)) == -1)
       perror("Add failed");
   }
-  printf("[DEBUG] Received response: %d\n", response);
 
 
   if (recv(sock_fd, &response, sizeof(response), 0) > 0){
@@ -144,7 +146,8 @@ void handle_snd_add(int sock_fd, const char *filename){
     if (recv(sock_fd, &response, sizeof(response), 0) > 0) {
       handle_response(response);
     } else {
-        perror("Failed to receive response");
+        handle_response(ERR_RESPONSE_RECV_FAIL);
+        return;
     }
 }
 
@@ -154,7 +157,8 @@ void handle_rcv_rename(int sock_fd) {
     if (recv(sock_fd, &response, sizeof(response), 0) > 0) {
         handle_response(response);
     } else {
-        perror("Failed to receive response");
+        handle_response(ERR_RESPONSE_RECV_FAIL);
+        return;
     }
 }
 
@@ -163,7 +167,8 @@ void handle_rcv_newuser(int sock_fd) {
     if (recv(sock_fd, &response, sizeof(response), 0) > 0) {
         handle_response(response);
     } else {
-        perror("Failed to receive response");
+        handle_response(ERR_RESPONSE_RECV_FAIL);
+        return;
     }
 }
 
@@ -213,6 +218,39 @@ const char* get_genre_name(unsigned char genre) {
     }
 }
 
+void handle_search_response(int sock_fd){
+  char buffer[512] = {0};
+  size_t bytes_received;
+  char *end_marker;
+  int respond = 0;
+
+  if (recv(sock_fd, &respond, sizeof(respond), 0) <= 0) {
+    handle_response(ERR_RESPONSE_RECV_FAIL);
+    return;
+  }  
+  if (respond != OK) {
+    handle_response(respond);  // handle the specific error
+    return;  // Exit without entering the loop
+  }   
+
+  while ((bytes_received = recv(sock_fd, buffer, sizeof(buffer) - 1, 0)) > 0){
+    buffer[bytes_received] = '\0'; // Null-terminate to use printf
+    end_marker = strstr(buffer, "END\n"); // Look for the end marker "END\n"
+    // If the end marker is found, replace it with a null terminator
+    if (end_marker != NULL) {
+      *end_marker = '\0';
+      printf("%s", buffer);
+      break;
+    }
+
+    printf("%s", buffer); 
+     }
+
+    if (bytes_received <= 0) {
+        handle_response(ERR_RESPONSE_RECV_FAIL);
+    }
+}
+
 void handle_response(int response) {
   switch (response) {
     case OK:
@@ -248,6 +286,8 @@ void handle_response(int response) {
     case ERR_TAG_PARSE_FAIL:
     printf("Error: Failed to parse ID3 tag\n");
     break;
-
+    case ERR_RESPONSE_RECV_FAIL:
+    printf("Error: Failed to receive response\n");
+       break;
   }
 }

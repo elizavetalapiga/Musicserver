@@ -38,7 +38,18 @@ int main() {
     // clear the array
     memset(command, 0, sizeof(command));
 
-    printf("Enter the command: list, get <song_name>, logout, login <user> <pass>; For admin: add <song_name>, delete <song_name>, rename <song_name new_name>, createuser <name> <password> <role>\n");
+    printf("Enter the command: list - list all songs on the server\n"
+      "get <song_name> - download the song from the server\n"
+      "logout - logout from the account\n"
+      "login <user> <pass> - log into account\n"
+      "info <song_name> - tag info query\n"
+      "search <album/artist/year/genre> <value> - search for songs by tag\n"
+      "For admin:\n"
+      "add <song_name> - upload the song to the server\n"
+      "delete <song_name> - delete the song from the server\n"
+      "rename <song_name new_name> - rename the song on the server\n"
+      "createuser <name> <password> <role> - create a new user account\n"
+      "changetag <song_name> - change the tag of the song\n");
     fgets(command, sizeof(command), stdin);
 
     // Remove newline character
