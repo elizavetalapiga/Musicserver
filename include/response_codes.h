@@ -10,6 +10,8 @@
 #define ERR_USER_EXSISTS 6
 #define ERR_FILE_OPEN_FAIL 7
 #define ERR_INCOMPLETE_TRANSFER 8
+#define ERR_TAG_NOT_FOUND 9
+#define ERR_TAG_PARSE_FAIL 10
 
 
 #endif

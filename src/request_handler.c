@@ -2,6 +2,7 @@
 #include "network_utils.h"
 #include "response_codes.h"
 #include "login.h"
+#include "tag_handler.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -53,6 +54,11 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, const char *
     handle_newuser(client_fd, command, role);
     return;
     }
+    else if (strncasecmp(command, "INFO ", 5) == 0) {
+      printf("[DEBUG] read_id3v1_tag() should be called\n");
+    read_id3v1_tag(client_fd, command);
+    return;
+  }
     else {
       send(client_fd, "ERROR: Unknown command\n", 24, 0);
     }

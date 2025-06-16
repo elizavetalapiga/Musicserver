@@ -1,6 +1,7 @@
 #include "recieve_handler.h"
 #include "response_codes.h"
 #include "network_utils.h"
+#include "tag_handler.h"
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -21,6 +22,9 @@ void handle_rcv(int sock_fd, const char *command) {
     }
     else if (strncasecmp(command, "CREATEUSER ", 11) == 0) {
         handle_rcv_delete(sock_fd); 
+    }
+    else if (strncasecmp(command, "INFO ", 5) == 0) {
+        handle_rcv_tag(sock_fd); 
     }
     
 }
@@ -163,6 +167,52 @@ void handle_rcv_newuser(int sock_fd) {
     }
 }
 
+void handle_rcv_tag(int sock_fd) {
+    int response = 0;
+    struct ID3v1Tag tag;
+
+    // Receive response code
+    if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
+        handle_response(ERR_GENERIC);
+        return;
+    }
+
+    if (response != OK) {
+        handle_response(response);
+        return; // Exit if there was an error
+    }
+
+    // Receive tag data
+    if (recv(sock_fd, &tag, sizeof(tag), 0) <= 0) {
+        handle_response(ERR_TAG_PARSE_FAIL);
+        return;
+    }
+
+    // Print tag information
+    printf("ID3v1 Tag Information:\n");
+    printf("Title: %s\n", tag.title);
+    printf("Artist: %s\n", tag.artist);
+    printf("Album: %s\n", tag.album);
+    printf("Year: %s\n", tag.year);  
+    printf("Genre: %d\n", tag.genre);    
+    printf("Genre: %s\n", get_genre_name(tag.genre));
+}
+const char* get_genre_name(unsigned char genre) {
+    switch (genre) {
+        case 0:  return "Blues";
+        case 1:  return "Classic Rock";
+        case 4:  return "Disco";
+        case 7:  return "Hip-Hop";
+        case 13: return "Pop";
+        case 17: return "Rock";
+        case 22: return "Death Metal";
+        case 25: return "Soundtrack";
+        case 32: return "Classical";
+        case 52: return "Electronic";
+        default: return "Unknown Genre";
+    }
+}
+
 void handle_response(int response) {
   switch (response) {
     case OK:
@@ -192,5 +242,12 @@ void handle_response(int response) {
     case ERR_INCOMPLETE_TRANSFER:
     printf("Error: Transfer of file failed\n");
     break;
+    case ERR_TAG_NOT_FOUND:
+    printf("Error: ID3 tag not found\n");
+    break;
+    case ERR_TAG_PARSE_FAIL:
+    printf("Error: Failed to parse ID3 tag\n");
+    break;
+
   }
 }
