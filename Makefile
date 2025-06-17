@@ -8,7 +8,7 @@ OBJ_DIR = obj
 BIN_DIR = bin
 
 # Object files
-CLIENT_OBJS = $(OBJ_DIR)/serverclient.o $(OBJ_DIR)/recieve_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login_client.o
+CLIENT_OBJS = $(OBJ_DIR)/serverclient.o $(OBJ_DIR)/recieve_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login_client.o $(OBJ_DIR)/tag_handler.o
 SERVER_OBJS = $(OBJ_DIR)/simpleserver.o $(OBJ_DIR)/request_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login.o $(OBJ_DIR)/tag_handler.o
 
 # Default build: build both server and client

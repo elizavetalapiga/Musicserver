@@ -29,6 +29,12 @@ void handle_rcv(int sock_fd, const char *command) {
     else if (strncasecmp(command, "SEARCH ", 7) == 0) {
         handle_search_response(sock_fd); 
     }
+    else if (strncasecmp(command, "CHANGETAG ", 10) == 0) {
+        handle_rcv_changetag(sock_fd); // tag type and new value follows "CHANGETAG "
+    }
+    else {
+        handle_response(ERR_PARSE); // Command not recognized
+    }
     
 }
 
@@ -202,21 +208,7 @@ void handle_rcv_tag(int sock_fd) {
     printf("Genre: %d\n", tag.genre);    
     printf("Genre: %s\n", get_genre_name(tag.genre));
 }
-const char* get_genre_name(unsigned char genre) {
-    switch (genre) {
-        case 0:  return "Blues";
-        case 1:  return "Classic Rock";
-        case 4:  return "Disco";
-        case 7:  return "Hip-Hop";
-        case 13: return "Pop";
-        case 17: return "Rock";
-        case 22: return "Death Metal";
-        case 25: return "Soundtrack";
-        case 32: return "Classical";
-        case 52: return "Electronic";
-        default: return "Unknown Genre";
-    }
-}
+
 
 void handle_search_response(int sock_fd){
   char buffer[512] = {0};
@@ -239,16 +231,48 @@ void handle_search_response(int sock_fd){
     // If the end marker is found, replace it with a null terminator
     if (end_marker != NULL) {
       *end_marker = '\0';
-      printf("%s", buffer);
+      printf("%s\n", buffer);
       break;
     }
 
-    printf("%s", buffer); 
+    printf("%s\n", buffer); 
      }
 
     if (bytes_received <= 0) {
         handle_response(ERR_RESPONSE_RECV_FAIL);
     }
+}
+void handle_rcv_changetag(int sock_fd){
+  int response = 0;
+  struct ID3v1Tag tag;
+printf("[DEBUG] Entered handle_rcv_changetag()\n");
+  // Receive response code
+  if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
+    handle_response(ERR_RESPONSE_RECV_FAIL);
+    return;
+}
+
+if (response != OK) {
+    handle_response(response);
+    return;
+}
+
+
+   // Receive tag data
+  if (recv(sock_fd, &tag, sizeof(tag), 0) <= 0) {
+    handle_response(ERR_TAG_PARSE_FAIL);
+    return;
+  }
+
+  // Print updated tag information
+  printf("Updated ID3v1 Tag Information:\n");
+  printf("Title: %s\n", tag.title);
+  printf("Artist: %s\n", tag.artist);
+  printf("Album: %s\n", tag.album);
+  printf("Year: %s\n", tag.year);  
+  printf("Genre: %d\n", tag.genre);    
+  printf("Genre: %s\n", get_genre_name(tag.genre));
+  fflush(stdout);
 }
 
 void handle_response(int response) {

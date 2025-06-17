@@ -13,10 +13,11 @@
 
 
 
-void handle_cmd(int client_fd, const char *command, int *logged_in, const char *role){
+void handle_cmd(int client_fd, const char *command, int *logged_in, char *role){
       // Always allow LOGIN
       if (strncasecmp(command, "LOGIN ", 6) == 0) {
         *logged_in = handle_login(client_fd, command, role); // returns 1 if successful
+        printf("[DEBUG] Role: '%s'\n", role);
         return;
     }
 
@@ -62,6 +63,11 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, const char *
     search_tag(client_fd, command);
     return;
   }
+  else if (strncasecmp(command, "CHANGETAG ", 10) == 0) {
+    printf("[DEBUG] Entered handle_changetag()\n");
+    handle_changetag(client_fd, command, role);
+    return;
+    }
     else {
       send(client_fd, "ERROR: Unknown command\n", 24, 0);
     }

@@ -15,5 +15,6 @@ struct ID3v1Tag {
 
 void read_id3v1_tag(int client_fd, const char *command);
 void search_tag(int client_fd, const char *command);
-
+const char* get_genre_name(unsigned char genre);
+void handle_changetag(int client_fd, const char *command, const char *role);
 #endif 
