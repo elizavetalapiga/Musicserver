@@ -3,6 +3,7 @@
 #include "response_codes.h"
 #include "login.h"
 #include "tag_handler.h"
+#include "db_handler.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -13,10 +14,10 @@
 
 
 
-void handle_cmd(int client_fd, const char *command, int *logged_in, char *role){
+void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, char *username){
       // Always allow LOGIN
       if (strncasecmp(command, "LOGIN ", 6) == 0) {
-        *logged_in = handle_login(client_fd, command, role); // returns 1 if successful
+        *logged_in = handle_login(client_fd, command, role, username); // returns 1 if successful
         printf("[DEBUG] Role: '%s'\n", role);
         return;
     }
@@ -68,6 +69,18 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role){
     handle_changetag(client_fd, command, role);
     return;
     }
+    else if (strncasecmp(command, "RATE ", 5) == 0) {
+      printf("[DEBUG] User '%s' is trying to rate a song\n", username);
+      handle_rate(client_fd, command + 5, username);
+     }
+     else if (strncasecmp(command, "AVG ", 4) == 0) {
+      printf("[DEBUG] User '%s' is requesting average rating\n", username);
+      handle_avg(client_fd, command + 4);
+     }
+     else if (strncasecmp(command, "DLCOUNT ", 8) == 0) {
+      printf("[DEBUG] User '%s' is requesting download count\n", username);
+      handle_dlcount(client_fd, command + 8);
+     }
     else {
       send(client_fd, "ERROR: Unknown command\n", 24, 0);
     }
@@ -105,7 +118,7 @@ void handle_get (int client_fd, const char *filename) {
   int respond = 0;
   long filesize = 0;
   // Trim newline, since const was passed we cannot change filename directly
-  strncpy(local_filename, filename, sizeof(local_filename));
+  strncpy(local_filename, filename, sizeof(local_filename)-1); //-1 to leave the room for \0
   local_filename[sizeof(local_filename)-1] = '\0';  // safety null
   local_filename[strcspn(local_filename, "\n")] = '\0';
 
@@ -142,9 +155,10 @@ void handle_get (int client_fd, const char *filename) {
   //check
   printf("File was sent: %s\n", path);
   fclose(file);
+  increment_download(local_filename);
 }
 
-int handle_login(int client_fd, const char *command, char *role_out) {
+int handle_login(int client_fd, const char *command, char *role_out, char *username_out) {
   char username[64], password[64];
   char role[64] = "";
   int respond = 0;
@@ -159,6 +173,7 @@ int handle_login(int client_fd, const char *command, char *role_out) {
  
   if (check_credentials(username, password, role)) {
       strcpy(role_out, role); // passing role back to caller
+      strcpy(username_out, username); 
       respond = OK;
       send(client_fd, &respond, sizeof(respond), 0);
       return 1;
@@ -353,4 +368,55 @@ fclose(file);
 respond = OK;
 send(client_fd, &respond, sizeof(respond), 0);
 
+}
+
+void handle_rate(int client_fd, const char *args, const char *user) {
+    char songname[128];
+    int rating;
+    
+    
+  
+    if (sscanf(args, "%127s %d", songname, &rating) != 2 || rating < 1 || rating > 5) { //check if comand is valid
+        dprintf(client_fd, "ERR Invalid usage. Use: RATE <song> <1-5>\n");
+        return;
+    }
+
+    if (rate_song(songname, user, rating)) {
+        dprintf(client_fd, "OK Rating saved for '%s'.\n", songname);
+    } else {
+        dprintf(client_fd, "ERR Failed to save rating.\n");
+    }
+}
+
+
+void handle_avg(int client_fd, const char *args) {
+    char songname[128];
+
+    if (sscanf(args, "%127s", songname) != 1) {
+        dprintf(client_fd, "ERR Usage: AVG <songname>\n");
+        return;
+    }
+
+    float avg = get_average_rating(songname);
+    if (avg < 0) {
+        dprintf(client_fd, "No ratings yet for '%s'.\n", songname);
+    } else {
+        dprintf(client_fd, "Average rating for '%s' is %.2f\n", songname, avg); //2 decimal places
+    }
+}
+
+void handle_dlcount(int client_fd, const char *args) {
+    char songname[128];
+
+    if (sscanf(args, "%127s", songname) != 1) {
+        dprintf(client_fd, "ERR Usage: DLCOUNT <song>\n");
+        return;
+    }
+
+    int count = get_download_count(songname);
+    if (count >= 0) {
+        dprintf(client_fd, "Download count for '%s': %d\n", songname, count);
+    } else {
+        dprintf(client_fd, "ERR Could not retrieve download count.\n");
+    }
 }

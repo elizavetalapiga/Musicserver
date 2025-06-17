@@ -1,4 +1,4 @@
-
+#include "db_handler.h"
 #include <signal.h>
 #include "network_utils.h"
 #include "request_handler.h"
@@ -16,6 +16,7 @@ int main(){
   int logged_in = 0;
   int opt = 1;
   char role[64] = "";  // store role for this client
+  char username[64] = "";
 
 
 
@@ -50,6 +51,11 @@ int main(){
   // SIGCHLD - Signal that a child process has terminated or changed state; SIG_IGN - Ignore this signal. Against zombi processes
   signal(SIGCHLD, SIG_IGN);
 
+  if (!init_database("music.db")) {
+    fprintf(stderr, "Database initialization failed\n");
+    exit(EXIT_FAILURE);
+}
+
   // (1) - in this case run forver
     while (1) {
       addr_len = sizeof(client_addr);
@@ -59,6 +65,8 @@ int main(){
         handle_error("Accept failed");
         continue; // try again
       }
+      
+      
 
       pid = fork();
       if (pid == 0) { //child process
@@ -80,7 +88,7 @@ int main(){
         }
         command[bytes] = '\0';  // Null-terminate it
         printf("[DEBUG] Received command: '%s'\n", command);
-         handle_cmd(client_fd, command, &logged_in, role);
+         handle_cmd(client_fd, command, &logged_in, role, username);
         }
 
         close(client_fd);
@@ -93,6 +101,6 @@ int main(){
         }
       }
 
-
+  close_database();
   return 0;
   }

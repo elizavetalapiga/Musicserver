@@ -32,6 +32,15 @@ void handle_rcv(int sock_fd, const char *command) {
     else if (strncasecmp(command, "CHANGETAG ", 10) == 0) {
         handle_rcv_changetag(sock_fd); // tag type and new value follows "CHANGETAG "
     }
+    else if (strncasecmp(command, "RATE ", 5) == 0) {
+    handle_rcv_rate(sock_fd);  // after "RATE "
+    }
+    else if (strncasecmp(command, "AVG ", 4) == 0) {
+    handle_rcv_avg(sock_fd);  // after "AVG "
+    }
+    else if (strncasecmp(command, "DLCOUNT ", 8) == 0) {
+    handle_rcv_dlcount(sock_fd);  // after "DLCOUNT "
+    }
     else {
         handle_response(ERR_PARSE); // Command not recognized
     }
@@ -274,6 +283,31 @@ if (response != OK) {
   printf("Genre: %s\n", get_genre_name(tag.genre));
   fflush(stdout);
 }
+
+void recv_and_print(int sock_fd) {
+    char buffer[256];
+    int bytes = recv(sock_fd, buffer, sizeof(buffer) - 1, 0);
+    if (bytes > 0) {
+        buffer[bytes] = '\0';
+        printf("%s", buffer);
+    } else if (bytes == 0) {
+        printf("Connection closed by server.\n");
+    } else {
+        handle_response(ERR_RESPONSE_RECV_FAIL);
+    }
+    printf("Debug: Received %d bytes from server.\n", bytes);
+}
+
+void handle_rcv_rate(int sock_fd) {
+    recv_and_print(sock_fd);
+}
+void handle_rcv_avg(int sock_fd) {
+    recv_and_print(sock_fd);
+}
+void handle_rcv_dlcount(int sock_fd) {
+    recv_and_print(sock_fd);
+}
+
 
 void handle_response(int response) {
   switch (response) {

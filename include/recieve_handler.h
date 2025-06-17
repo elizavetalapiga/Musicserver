@@ -11,6 +11,10 @@ void handle_rcv_tag(int sock_fd);
 void handle_search_response(int sock_fd);
 void handle_response(int response);
 void handle_rcv_changetag(int sock_fd);
-
+void recv_and_print(int sock_fd);
+void handle_rcv_rate(int sock_fd);
+void handle_rcv_avg(int sock_fd);
+void handle_rcv_dlcount(int sock_fd);
+void recv_and_print(int sock_fd);
 
 #endif

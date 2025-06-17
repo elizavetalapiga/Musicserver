@@ -1,6 +1,7 @@
 # Compiler and flags
 CC = gcc
 CFLAGS = -Wall -Wextra -Iinclude
+LDFLAGS = -lsqlite3
 
 # Directories
 SRC_DIR = src
@@ -9,7 +10,7 @@ BIN_DIR = bin
 
 # Object files
 CLIENT_OBJS = $(OBJ_DIR)/serverclient.o $(OBJ_DIR)/recieve_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login_client.o $(OBJ_DIR)/tag_handler.o
-SERVER_OBJS = $(OBJ_DIR)/simpleserver.o $(OBJ_DIR)/request_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login.o $(OBJ_DIR)/tag_handler.o
+SERVER_OBJS = $(OBJ_DIR)/simpleserver.o $(OBJ_DIR)/request_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login.o $(OBJ_DIR)/tag_handler.o $(OBJ_DIR)/db_handler.o
 
 # Default build: build both server and client
 all: $(BIN_DIR)/serverclient $(BIN_DIR)/simpleserver
@@ -20,7 +21,7 @@ $(BIN_DIR)/serverclient: $(CLIENT_OBJS)
 
 # Build server
 $(BIN_DIR)/simpleserver: $(SERVER_OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 # Compile object files
 $(OBJ_DIR)/serverclient.o: $(SRC_DIR)/serverclient.c
@@ -45,6 +46,9 @@ $(OBJ_DIR)/login.o: $(SRC_DIR)/login.c include/login.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/tag_handler.o: $(SRC_DIR)/tag_handler.c include/tag_handler.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/db_handler.o: $(SRC_DIR)/db_handler.c include/db_handler.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Clean build files
