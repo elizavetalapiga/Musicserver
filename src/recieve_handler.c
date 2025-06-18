@@ -11,8 +11,8 @@ void handle_rcv(int sock_fd, const char *command) {
     if (strcasecmp(command, "LIST") == 0) {
         handle_rcv_list(sock_fd);
     }
-    else if (strncasecmp(command, "GET ", 4) == 0) {
-        handle_rcv_get(sock_fd, command + 4); // filename follows "GET "
+    else if (strncasecmp(command, "PLAY ", 5) == 0) {
+        handle_rcv_get(sock_fd, command + 5); // filename follows "GET "
     }
     else if (strncasecmp(command, "DELETE ", 7) == 0) {
         handle_rcv_delete(sock_fd); 
@@ -85,6 +85,7 @@ long bytes_received;
 char path[256] = {0};
 long filesize;
 long received_total = 0;
+char play_cmd[512]; //buffer for command to play a song
 
 
   //reciving filesize or error
@@ -117,7 +118,12 @@ long received_total = 0;
     }
 
     fclose(fp);
-    printf("File received: %ld bytes\n", received_total);
+    printf("File received: %ld bytes\n", received_total);    
+    
+    snprintf(play_cmd, sizeof(play_cmd), "ffplay -nodisp -autoexit \"client_music/%s\"", filename);//crafting the command to play song
+    printf("[DEBUG] Playing file: %s\n", filename);
+    system(play_cmd);//system call to execute the command
+
 }
 
 void handle_snd_add(int sock_fd, const char *filename){

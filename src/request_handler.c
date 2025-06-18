@@ -39,8 +39,8 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
    if (strcasecmp(command, "LIST") == 0) {
         handle_list(client_fd);
     }
-    else if (strncasecmp(command, "GET ", 4) == 0) {
-        handle_get(client_fd, command + 4);
+    else if (strncasecmp(command, "PLAY ", 5) == 0) {
+        handle_get(client_fd, command + 5);
     }
     else if (strncasecmp(command, "ADD ", 4) == 0) {
       handle_add(client_fd, command, role);
