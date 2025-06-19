@@ -2,6 +2,7 @@
 #include "response_codes.h"
 #include "network_utils.h"
 #include "tag_handler.h"
+#include "cache_handler.h"
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -40,6 +41,11 @@ void handle_rcv(int sock_fd, const char *command) {
     }
     else if (strncasecmp(command, "DLCOUNT ", 8) == 0) {
     handle_rcv_dlcount(sock_fd);  // after "DLCOUNT "
+    }
+    else if ((strncasecmp(command, "LOGOUT" ,6) == 0) || (strncasecmp(command, "LOGIN ", 6) == 0)) {
+    int response;
+    recv(sock_fd, &response, sizeof(response), 0);
+    handle_response(response);
     }
     else {
         handle_response(ERR_PARSE); // Command not recognized
@@ -85,8 +91,6 @@ long bytes_received;
 char path[256] = {0};
 long filesize;
 long received_total = 0;
-char play_cmd[512]; //buffer for command to play a song
-
 
   //reciving filesize or error
   recv(sock_fd, &filesize, sizeof(filesize), 0);
@@ -118,12 +122,15 @@ char play_cmd[512]; //buffer for command to play a song
     }
 
     fclose(fp);
-    printf("File received: %ld bytes\n", received_total);    
-    
+    printf("File received: %ld bytes\n", received_total);  
+    handle_play(filename); //play the song after recieving it    
+    }
+
+void handle_play(const char *filename) {
+    char play_cmd[512]; // buffer for the command to play a song
     snprintf(play_cmd, sizeof(play_cmd), "ffplay -nodisp -autoexit \"client_music/%s\"", filename);//crafting the command to play song
     printf("[DEBUG] Playing file: %s\n", filename);
     system(play_cmd);//system call to execute the command
-
 }
 
 void handle_snd_add(int sock_fd, const char *filename){
@@ -353,5 +360,9 @@ void handle_response(int response) {
     case ERR_RESPONSE_RECV_FAIL:
     printf("Error: Failed to receive response\n");
        break;
+    case ERR_UNKNOWN_COMMAND:
+    printf("Error: Unknown command\n");
+      break;
   }
+
 }

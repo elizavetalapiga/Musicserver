@@ -16,5 +16,6 @@ void handle_rcv_rate(int sock_fd);
 void handle_rcv_avg(int sock_fd);
 void handle_rcv_dlcount(int sock_fd);
 void recv_and_print(int sock_fd);
-
+void handle_play(const char *filename);
+void cleanup_cache();
 #endif

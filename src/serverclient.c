@@ -55,8 +55,23 @@ int main() {
       "changetag <song_name> <album/artist/year/genre> <value> - change the tag of the song\n");
     fgets(command, sizeof(command), stdin);
 
-    // Remove newline character
+    // Remove newline character (fgets includes it because client press Enter)
     command[strcspn(command,"\n")]= '\0';
+    
+    if ((strncasecmp(command, "PLAY ", 5) == 0) && (check_cache(command + 5) == 1)) {
+      printf("[DEBUG] Playing from cache: %s\n", command + 5);
+      handle_play(command + 5); // filename follows "PLAY "
+      continue; // Skip sending the command to the server
+    }
+
+    if ((strncasecmp(command, "EXIT", 4) == 0)  || (strncasecmp(command, "LOGOUT", 6) == 0)) {
+      printf("[DEBUG] Cleaning cache\n");
+      cleanup_cache();
+      if (strncasecmp(command, "EXIT", 4) == 0) {
+        printf("Exiting the client.\n");
+        break; // Exit the loop and close the socket
+      } 
+    }
 
     // Sends commands
     if ((send(sock_fd , command, strlen(command), 0)) == -1){

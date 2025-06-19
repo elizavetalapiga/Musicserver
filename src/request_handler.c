@@ -26,14 +26,16 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
     // Always allow LOGOUT
     if (strcasecmp(command, "LOGOUT") == 0) {
         *logged_in = 0;
-        send(client_fd, "You have been logged out.\n", 27, 0);
+        int respond = OK;
+        send(client_fd, &respond, sizeof(respond), 0);  // send int, not string       
         return;
     }
 
     // Block all other commands if not logged in
     if (!*logged_in) {
-        send(client_fd, "ERROR: Please LOGIN first.\n", 28, 0);
-        return;
+      int respond = ERR_PERMISSION;
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
     }
 
   //other commands
@@ -82,7 +84,7 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
       printf("[DEBUG] User '%s' is requesting download count\n", username);
       handle_dlcount(client_fd, command + 8);
      }
-    else {
+      else {
       send(client_fd, "ERROR: Unknown command\n", 24, 0);
     }
 }

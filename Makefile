@@ -9,7 +9,7 @@ OBJ_DIR = obj
 BIN_DIR = bin
 
 # Object files
-CLIENT_OBJS = $(OBJ_DIR)/serverclient.o $(OBJ_DIR)/recieve_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login_client.o $(OBJ_DIR)/tag_handler.o
+CLIENT_OBJS = $(OBJ_DIR)/serverclient.o $(OBJ_DIR)/recieve_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login_client.o $(OBJ_DIR)/tag_handler.o $(OBJ_DIR)/cache_handler.o
 SERVER_OBJS = $(OBJ_DIR)/simpleserver.o $(OBJ_DIR)/request_handler.o $(OBJ_DIR)/network_utils.o $(OBJ_DIR)/login.o $(OBJ_DIR)/tag_handler.o $(OBJ_DIR)/db_handler.o
 
 # Default build: build both server and client
@@ -49,6 +49,9 @@ $(OBJ_DIR)/tag_handler.o: $(SRC_DIR)/tag_handler.c include/tag_handler.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/db_handler.o: $(SRC_DIR)/db_handler.c include/db_handler.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/cache_handler.o: $(SRC_DIR)/cache_handler.c include/cache_handler.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Clean build files
