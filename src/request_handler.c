@@ -9,6 +9,7 @@
 
 #include <dirent.h>
 #include <sys/socket.h>
+#include <sys/file.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 
@@ -127,12 +128,33 @@ void handle_get (int client_fd, const char *filename) {
   snprintf(path, sizeof(path), "music/%s", local_filename);
   printf("Trying to open file: %s\n", path);
 
+  // Open the file descriptor
+  int fd = open(path, O_RDONLY);
+  if (fd < 0) {
+      perror("open failed");
+      filesize = -1;
+      send(client_fd, &filesize, sizeof(filesize), 0);
+      handle_error("File not found or inaccessible");
+      return;
+  }
+
+    // Appling the shared lock to allow safe concurrent reading
+  if (flock(fd, LOCK_SH) < 0) {
+      perror("LOCK_SH failed");
+      close(fd);
+      filesize = -1;
+      send(client_fd, &filesize, sizeof(filesize), 0);
+      handle_error("Failed to lock file for reading");
+      return;
+  }
+
   //checking if the file can be open. RB - Read in Binary Mode, required for mp3
-  FILE *file;
-  if ((file = fopen(path, "rb")) == NULL) {
+  FILE *file =  fdopen(fd, "rb");
+  if (!file) {
+    close(fd);
     filesize = -1;
     send(client_fd, &filesize, sizeof(filesize), 0);
-    handle_error("File opening failed");
+    handle_error("File opening failed");   
   }
 
   //filesize collection ans sending in order to stop the loop on client side
@@ -146,7 +168,7 @@ void handle_get (int client_fd, const char *filename) {
     if ((send(client_fd, buffsndr, reads_bytes, 0)) == -1){
       respond = ERR_GENERIC;
     send(client_fd, &respond, sizeof(respond), 0);  
-    fclose(file);
+    fclose(file); // releases lock and closes fd
     perror("Send failed");
     return;
     }
@@ -186,6 +208,7 @@ int handle_login(int client_fd, const char *command, char *role_out, char *usern
 
 void handle_add(int client_fd, const char *command, const char *role) {
   int respond = 0;
+  int fd;
   char filename[128];
   char filepath[256];
   long filesize = 0;
@@ -210,10 +233,28 @@ void handle_add(int client_fd, const char *command, const char *role) {
   //crafting the filepath
   snprintf(filepath, sizeof(filepath), "music/%s", filename);
 
-  //creating file for writing
-  FILE *file = fopen(filepath, "wb");
-  if (file == NULL) {
+  // Open the file for writing (truncate if exists, create if not)
+  fd = open(filepath, O_WRONLY | O_CREAT | O_TRUNC, 0666); //O_CREAT - If the file doesn’t exist, create it. O_TRUNC - If the file does exist, truncate (empty) it to 0 bytes. 0666 - permission bits
+  if (fd < 0) {
       respond = ERR_FILE_OPEN_FAIL;
+      close(fd);
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
+  }
+
+ //Lock the file exclusively
+  if (flock(fd, LOCK_EX) < 0) {
+      respond = ERR_GENERIC;
+      close(fd);
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
+  }
+
+  //creating file for writing
+  FILE *file = fdopen(fd, "wb");
+  if (!file) {
+      respond = ERR_FILE_OPEN_FAIL;
+      close(fd);
       send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
@@ -237,7 +278,7 @@ void handle_add(int client_fd, const char *command, const char *role) {
       received += chunk;
   }
 
-  fclose(file);
+  fclose(file); // unlocks + closes
 
   // if received == filesize then respond=ok othewise error;
   respond = (received == filesize) ? OK : ERR_INCOMPLETE_TRANSFER;
@@ -276,7 +317,7 @@ void handle_delete(int client_fd, const char *command, const char *role) {
 
 void handle_rename(int client_fd, const char *command, const char *role) {
 int respond;
-FILE *file;
+int fd;
 char old_name [128], new_name [128], old_path [256], new_path [256];
 
 //check for admin role
@@ -293,20 +334,33 @@ if (sscanf(command + 7, "%127s %127s", old_name, new_name) != 2) {
     return;
 }
 
-if ((file=fopen(old_name,"r")) != NULL){
+snprintf(old_path, sizeof(old_path), "music/%s", old_name);
+snprintf(new_path, sizeof(new_path), "music/%s", new_name);
+
+// Open the old file for locking
+fd = open(old_path, O_RDWR);
+if (fd < 0) {
   respond = ERR_FILE_OPEN_FAIL;
   send(client_fd, &respond, sizeof(respond), 0);
   return;
 }
 
-snprintf(old_path, sizeof(old_path), "music/%s", old_name);
-snprintf(new_path, sizeof(new_path), "music/%s", new_name);
+// Lock the file exclusively to block readers/writers
+if (flock(fd, LOCK_EX) < 0) {
+  close(fd);
+  respond = ERR_GENERIC;
+  send(client_fd, &respond, sizeof(respond), 0);
+  return;
+}
+
 
 printf("[DEBUG] Rename: %s -> %s\n", old_path, new_path);
 
 
 respond = (rename(old_path, new_path) == 0) ? OK : ERR_GENERIC;
 send(client_fd, &respond, sizeof(respond), 0);
+close(fd);  // releases lock
+
 }
 
 
