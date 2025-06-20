@@ -76,20 +76,20 @@ int main(){
           // clear the array
           memset(command, 0, sizeof(command));
 
-        int bytes = recv(client_fd, command, sizeof(command), 0);
-        
-        if (bytes == 0) {
-            printf("Client disconnected.\n");
-            break;
-        }
-        if (bytes < 0) {
-            perror("recv failed");
-            break;
-        }
-        command[bytes] = '\0';  // Null-terminate it
-        printf("[DEBUG] Received command: '%s'\n", command);
-         handle_cmd(client_fd, command, &logged_in, role, username);
-        }
+          int bytes = recv(client_fd, command, sizeof(command), 0);
+          
+          if (bytes == 0) {
+              printf("Client disconnected.\n");
+              break;
+          }
+          if (bytes < 0) {
+              perror("recv failed");
+              break;
+          }
+          command[bytes] = '\0';  // Null-terminate it
+          printf("[DEBUG] Received command: '%s'\n", command);
+            handle_cmd(client_fd, command, &logged_in, role, username);
+          }
 
         close(client_fd);
         exit(0);

@@ -3,6 +3,7 @@
 #include "network_utils.h"
 #include "tag_handler.h"
 #include "cache_handler.h"
+#include "disk_space.h"
 #include <string.h>
 #include <stdio.h>
 #include <dirent.h>
@@ -16,13 +17,13 @@ void handle_rcv(int sock_fd, const char *command) {
         handle_rcv_get(sock_fd, command + 5); // filename follows "GET "
     }
     else if (strncasecmp(command, "DELETE ", 7) == 0) {
-        handle_rcv_delete(sock_fd); 
+        handle_rcv_delete(sock_fd,command + 7); 
     }
     else if (strncasecmp(command, "RENAME ", 7) == 0) {
       handle_rcv_rename(sock_fd);
     }
     else if (strncasecmp(command, "CREATEUSER ", 11) == 0) {
-        handle_rcv_delete(sock_fd); 
+        handle_rcv_newuser(sock_fd); 
     }
     else if (strncasecmp(command, "INFO ", 5) == 0) {
         handle_rcv_tag(sock_fd); 
@@ -42,13 +43,10 @@ void handle_rcv(int sock_fd, const char *command) {
     else if (strncasecmp(command, "DLCOUNT ", 8) == 0) {
     handle_rcv_dlcount(sock_fd);  // after "DLCOUNT "
     }
-    else if ((strncasecmp(command, "LOGOUT" ,6) == 0) || (strncasecmp(command, "LOGIN ", 6) == 0)) {
+      else {
     int response;
     recv(sock_fd, &response, sizeof(response), 0);
-    handle_response(response);
-    }
-    else {
-        handle_response(ERR_PARSE); // Command not recognized
+    handle_response(response);        
     }
     
 }
@@ -91,6 +89,7 @@ long bytes_received;
 char path[256] = {0};
 long filesize;
 long received_total = 0;
+long disk_space = 0;
 
   //reciving filesize or error
   recv(sock_fd, &filesize, sizeof(filesize), 0);
@@ -98,6 +97,13 @@ long received_total = 0;
   handle_response(ERR_FILE_NOT_FOUND);
   return;
   }
+
+  if (check_disk_space("client_music", filesize, &disk_space) == 0){
+    printf("Not enough disk space to save the file, total available space: %ld bytes.\n", disk_space);
+    printf("File '%ld' not saved.\n", filesize);
+    return;
+  }
+
   printf("[DEBUG] Sending filesize: %ld\n", filesize);
   //building the path
   snprintf(path, sizeof(path), "client_music/%s", filename);
@@ -143,13 +149,24 @@ void handle_snd_add(int sock_fd, const char *filename){
  
    
   snprintf(path, sizeof(path), "client_music/%s", filename);
- 
+
+  if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
+    handle_error("No response or connection closed");
+    return; 
+    }
+
+  if (response == ERR_FILE_EXISTS) {
+      handle_response(response);  
+      return;  
+    } 
 
   if ((file = fopen(path, "rb")) == NULL) {
        handle_error("File opening failed");
   }
  
-    //filesize collection ans sending in order to stop the loop on client side
+  
+
+  //filesize collection ans sending in order to stop the loop on client side
   fseek(file, 0, SEEK_END);
   filesize = ftell(file);
   rewind(file); //reset pointer to the begining of file
@@ -169,14 +186,29 @@ void handle_snd_add(int sock_fd, const char *filename){
     fclose(file);   
   }
 
-  void handle_rcv_delete(int sock_fd) {
+  void handle_rcv_delete(int sock_fd, const char *filename) {
     int response = 0;
-    if (recv(sock_fd, &response, sizeof(response), 0) > 0) {
+    char filepath[512];
+
+    if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
+    handle_error("No response or connection closed");
+    return;
+      }
+    if (response != OK) {
       handle_response(response);
-    } else {
-        handle_response(ERR_RESPONSE_RECV_FAIL);
-        return;
+      return;
     }
+      
+  //crafting the filepath
+  snprintf(filepath, sizeof(filepath), "client_music/%s", filename);
+  printf("[DEBUG] Trying to delete: %s\n", filepath);
+
+  //removing file, sending the respond
+  if (remove(filepath) == 0) {
+    printf("%s was deleted on server and client side\n", filename);
+  } else {
+    printf("[INFO] '%s' deleted on server, but not found in local cache.\n", filename);
+}
 }
 
 
@@ -362,6 +394,12 @@ void handle_response(int response) {
        break;
     case ERR_UNKNOWN_COMMAND:
     printf("Error: Unknown command\n");
+      break;
+    case ERR_FILE_EXISTS:
+    printf("Error: File is already exist\n");
+      break;
+    case ERR_DISK_IS_FULL:
+    printf("Error: Not enough space on a disk\n");
       break;
   }
 

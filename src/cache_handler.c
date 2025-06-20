@@ -1,16 +1,15 @@
 #include "cache_handler.h"
 #include <stdio.h>
 #include <dirent.h>
+#include <unistd.h>
 
 
 int check_cache(const char *filename){
     char filepath[256];
     snprintf(filepath, sizeof(filepath), "client_music/%s", filename);
     
-    // Try to open the file in read mode
-    FILE *file = fopen(filepath, "rb");
-    if (file) {
-        fclose(file);
+
+    if (access(filepath, F_OK) == 0) {// Check if file exists in cache        
         return 1; // File exists in cache
     }
     

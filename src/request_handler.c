@@ -4,6 +4,7 @@
 #include "login.h"
 #include "tag_handler.h"
 #include "db_handler.h"
+#include "disk_space.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -40,53 +41,59 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
 
   //other commands
    if (strcasecmp(command, "LIST") == 0) {
-        handle_list(client_fd);
-    }
+      handle_list(client_fd);
+      return;
+      }
     else if (strncasecmp(command, "PLAY ", 5) == 0) {
-        handle_get(client_fd, command + 5);
-    }
+      handle_get(client_fd, command + 5);
+      return;
+      }
     else if (strncasecmp(command, "ADD ", 4) == 0) {
       handle_add(client_fd, command, role);
-     }
+      return;
+      }
     else if (strncasecmp(command, "DELETE ", 7) == 0) {
       handle_delete(client_fd, command, role);
-     }
+      }
     else if (strncasecmp(command, "RENAME ", 7) == 0) {
       handle_rename(client_fd, command, role);
       return;
-    } 
+      } 
     else if (strncasecmp(command, "CREATEUSER ", 11) == 0) {
-    handle_newuser(client_fd, command, role);
-    return;
-    }
+      handle_newuser(client_fd, command, role);
+      return;
+      }
     else if (strncasecmp(command, "INFO ", 5) == 0) {
-    read_id3v1_tag(client_fd, command);
-    return;
-  }
-  else if (strncasecmp(command, "SEARCH ", 7) == 0) {
-    search_tag(client_fd, command);
-    return;
-  }
-  else if (strncasecmp(command, "CHANGETAG ", 10) == 0) {
-    printf("[DEBUG] Entered handle_changetag()\n");
-    handle_changetag(client_fd, command, role);
-    return;
-    }
+      read_id3v1_tag(client_fd, command);
+      return;
+      }
+    else if (strncasecmp(command, "SEARCH ", 7) == 0) {
+      search_tag(client_fd, command);
+      return;
+      }
+    else if (strncasecmp(command, "CHANGETAG ", 10) == 0) {
+      printf("[DEBUG] Entered handle_changetag()\n");
+      handle_changetag(client_fd, command, role);
+      return;
+      }
     else if (strncasecmp(command, "RATE ", 5) == 0) {
       printf("[DEBUG] User '%s' is trying to rate a song\n", username);
       handle_rate(client_fd, command + 5, username);
-     }
-     else if (strncasecmp(command, "AVG ", 4) == 0) {
+      return;
+      }
+    else if (strncasecmp(command, "AVG ", 4) == 0) {
       printf("[DEBUG] User '%s' is requesting average rating\n", username);
       handle_avg(client_fd, command + 4);
-     }
-     else if (strncasecmp(command, "DLCOUNT ", 8) == 0) {
+      return;
+      }
+    else if (strncasecmp(command, "DLCOUNT ", 8) == 0) {
       printf("[DEBUG] User '%s' is requesting download count\n", username);
       handle_dlcount(client_fd, command + 8);
-     }
-      else {
+      return;
+      }
+    else {
       send(client_fd, "ERROR: Unknown command\n", 24, 0);
-    }
+  }
 }
 
 void handle_list(int client_fd){
@@ -165,6 +172,7 @@ void handle_get (int client_fd, const char *filename) {
   rewind(file); //reset pointer to the begining of file
   send(client_fd, &filesize, sizeof(filesize), 0);
 
+  
   // Sending chunks + Error handeling
   while ((reads_bytes = fread(buffsndr, 1, sizeof(buffsndr), file)) > 0){
     if ((send(client_fd, buffsndr, reads_bytes, 0)) == -1){
@@ -217,6 +225,8 @@ void handle_add(int client_fd, const char *command, const char *role) {
   char buffer[1024];
   long received = 0;
   int chunk;
+  long disk_space = 0;
+
 
   //check for admin role
   if (strcmp(role, "admin") != 0) {
@@ -232,14 +242,39 @@ void handle_add(int client_fd, const char *command, const char *role) {
       return;
   }
 
-  //crafting the filepath
+    //crafting the filepath
   snprintf(filepath, sizeof(filepath), "music/%s", filename);
 
+
+  if (access(filepath, F_OK) == 0) {// check if file exsists
+      respond = ERR_FILE_EXISTS;
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
+  } else {
+      respond = OK; // file does not exist, we can proceed
+      send(client_fd, &respond, sizeof(respond), 0);
+      }
+
+    
+    //reciving the filesize. Check for failed read or connection closed, and for invalid data
+  if (recv(client_fd, &filesize, sizeof(filesize), 0) <= 0 || filesize <= 0) {
+      respond = ERR_GENERIC;
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
+  }
+
+  if (check_disk_space("music", filesize, &disk_space) == 0){
+    respond = ERR_DISK_IS_FULL;
+    send(client_fd, &respond, sizeof(respond), 0);
+    return;
+  }
+
+
+
   // Open the file for writing (truncate if exists, create if not)
-  fd = open(filepath, O_WRONLY | O_CREAT | O_TRUNC, 0666); //O_CREAT - If the file doesn’t exist, create it. O_TRUNC - If the file does exist, truncate (empty) it to 0 bytes. 0666 - permission bits
+  fd = open(filepath, O_WRONLY | O_CREAT, 0666); //O_CREAT - If the file doesn’t exist, create it. 0666 - permission bits
   if (fd < 0) {
       respond = ERR_FILE_OPEN_FAIL;
-      close(fd);
       send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
@@ -261,13 +296,6 @@ void handle_add(int client_fd, const char *command, const char *role) {
       return;
   }
 
-  //reciving the filesize. Check for failed read or connection closed, and for invalid data
-  if (recv(client_fd, &filesize, sizeof(filesize), 0) <= 0 || filesize <= 0) {
-      fclose(file);
-      respond = ERR_GENERIC;
-      send(client_fd, &respond, sizeof(respond), 0);
-      return;
-  }
 
  //recieving file
   while (received < filesize) {
@@ -279,7 +307,7 @@ void handle_add(int client_fd, const char *command, const char *role) {
       fwrite(buffer, 1, chunk, file);
       received += chunk;
   }
-
+printf("[DEBUG] Adding file: %s\n", filename);
   fclose(file); // unlocks + closes
 
   // if received == filesize then respond=ok othewise error;
@@ -312,7 +340,7 @@ void handle_delete(int client_fd, const char *command, const char *role) {
   printf("[DEBUG] Trying to delete: %s\n", filepath);
 
   //removing file, sending the respond
-  respond = (remove(filepath) == 0) ? 1 : 0;
+  respond = (remove(filepath) == 0) ? OK : ERR_GENERIC;
   send(client_fd, &respond, sizeof(respond), 0);
   return;
 }

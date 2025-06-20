@@ -1,6 +1,7 @@
 #include "network_utils.h"
 #include "recieve_handler.h"
 #include "login_client.h"
+#include "cache_handler.h"
 
 #define PORT 8080
 #define IP_SERVER "127.0.0.1"
@@ -82,7 +83,8 @@ int main() {
     //add function call
     if (strncasecmp(command, "ADD ", 4) == 0) {      
       sscanf(command + 4, "%127s", filename);
-      handle_snd_add(sock_fd, filename);  
+      handle_snd_add(sock_fd, filename);
+      continue;  
     }
 
     printf("[DEBUG] Sent command: %s\n", command);
