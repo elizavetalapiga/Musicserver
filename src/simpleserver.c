@@ -2,6 +2,7 @@
 #include <signal.h>
 #include "network_utils.h"
 #include "request_handler.h"
+#include "tag_handler.h"
 
 
 
@@ -12,13 +13,15 @@ int main(){
   struct  sockaddr_in server_addr;
   struct  sockaddr_in client_addr;
   pid_t pid;
-  char command[512];
+  char command[1024];
   int logged_in = 0;
   int opt = 1;
   char role[64] = "";  // store role for this client
   char username[64] = "";
   char ip[64];
   int port;
+
+ 
 
   if (!load_config(ip, sizeof(ip), &port)) {
       exit(EXIT_FAILURE);
@@ -58,7 +61,8 @@ int main(){
   if (!init_database("music.db")) {
     fprintf(stderr, "Database initialization failed\n");
     exit(EXIT_FAILURE);
-}
+  }
+  index_songs("music");
 
   // (1) - in this case run forver
     while (1) {

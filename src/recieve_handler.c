@@ -86,7 +86,7 @@ void handle_rcv_list(int sock_fd) {
 void handle_rcv_get(int sock_fd, const char *filename){
 char buffer[1024] = {0};
 long bytes_received;
-char path[256] = {0};
+char path[512] = {0};
 long filesize;
 long received_total = 0;
 long disk_space = 0;
@@ -234,8 +234,8 @@ void handle_rcv_newuser(int sock_fd) {
 
 void handle_rcv_tag(int sock_fd) {
     int response = 0;
-    struct ID3v1Tag tag;
-
+    char buffer [512];
+    
     // Receive response code
     if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
         handle_response(ERR_GENERIC);
@@ -248,19 +248,13 @@ void handle_rcv_tag(int sock_fd) {
     }
 
     // Receive tag data
-    if (recv(sock_fd, &tag, sizeof(tag), 0) <= 0) {
+    if (recv(sock_fd, buffer, sizeof(buffer), 0) <= 0) {
         handle_response(ERR_TAG_PARSE_FAIL);
         return;
     }
 
-    // Print tag information
-    printf("ID3v1 Tag Information:\n");
-    printf("Title: %s\n", tag.title);
-    printf("Artist: %s\n", tag.artist);
-    printf("Album: %s\n", tag.album);
-    printf("Year: %s\n", tag.year);  
-    printf("Genre: %d\n", tag.genre);    
-    printf("Genre: %s\n", get_genre_name(tag.genre));
+    // Print the received tag info
+    printf("%s\n", buffer);
 }
 
 

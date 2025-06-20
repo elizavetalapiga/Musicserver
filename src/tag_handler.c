@@ -4,8 +4,8 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
- #include <dirent.h>
- #include <stdlib.h>
+#include <dirent.h>
+#include <stdlib.h>
 
 
 
@@ -16,143 +16,100 @@
 #define ID3V1_ALBUM_SIZE 30
 #define ID3V1_YEAR_SIZE 4
 
+
+struct SongMetadata song_index[MAX_SONGS];
+int song_count = 0;
+
+
 // Load ID3v1 tag from an MP3 file safely by reading last 128 bytes
-void read_id3v1_tag(int client_fd, const char *command) {
-    const char *filename = command + 5;
-    char filepath[256];
-    snprintf(filepath, sizeof(filepath), "music/%s", filename);
-    int code = 0;
-        
+int read_id3v1_tag(const char *filepath, struct ID3v1Tag *tag) {
+    printf("[DEBUG] Reading ID3v1 tag from file: %s\n", filepath);       
     FILE *fp = fopen(filepath, "rb");
     if (!fp) {
-        {
-        code = ERR_FILE_NOT_FOUND;
-        send(client_fd, &code, sizeof(code), 0);
-        return;
-    }
+        return 0;
     } // File not found or couldn't be opened
 
     // Seek to last 128 bytes (location of ID3v1 tag)
     if (fseek(fp, -ID3V1_TAG_SIZE, SEEK_END) != 0) {
         fclose(fp);
-        code = ERR_TAG_PARSE_FAIL;
-        send(client_fd, &code, sizeof(code), 0);
-        return;
+        return 0;
     }
 
     // Read tag into buffer
     unsigned char buffer[ID3V1_TAG_SIZE];
     if (fread(buffer, 1, ID3V1_TAG_SIZE, fp) != ID3V1_TAG_SIZE) {
         fclose(fp);
-        code = ERR_TAG_PARSE_FAIL;
-        send(client_fd, &code, sizeof(code), 0);
-        return;
+        return 0;
     }
     fclose(fp); // Done reading the file
 
     // Check for the "TAG" identifier
     if (memcmp(buffer, "TAG", 3) != 0) {
-        code = ERR_TAG_NOT_FOUND;
-        send(client_fd, &code, sizeof(code), 0);
-        return; // No ID3v1 tag found
+        return 0; // No ID3v1 tag found
     }
-    // Extract and null-terminate each field safely
-    struct ID3v1Tag tag;
-    memset(&tag, 0, sizeof(tag));  // clear everything
-    // Title (bytes 3–32)
-    memcpy(tag.title,  buffer + 3,  ID3V1_TITLE_SIZE);
-    tag.title[ID3V1_TITLE_SIZE] = '\0';
-    // Artist (bytes 33–62)
-    memcpy(tag.artist, buffer + 33, ID3V1_ARTIST_SIZE);
-    tag.artist[ID3V1_ARTIST_SIZE] = '\0';
-    // Album (bytes 63–92)
-    memcpy(tag.album,  buffer + 63, ID3V1_ALBUM_SIZE);
-    tag.album[ID3V1_ALBUM_SIZE] = '\0';
-    // Year (bytes 93–96)
-    memcpy(tag.year,   buffer + 93, ID3V1_YEAR_SIZE);
-    tag.year[ID3V1_YEAR_SIZE] = '\0';
-    // Read genre byte (last byte of 128-byte ID3v1 tag)
-    tag.genre = buffer[127];
 
-    code = OK;
-    send(client_fd, &code, sizeof(code), 0);
-    send(client_fd, &tag, sizeof(tag), 0);
-    // Clear the tag structure to avoid memory leaks
-    memset(&tag, 0, sizeof(tag));
+    memset(tag, 0, sizeof(*tag));  // clear memory where tag points to
+
+    // Title (bytes 3–32)
+    memcpy(tag->title,  buffer + 3,  ID3V1_TITLE_SIZE);
+    tag->title[ID3V1_TITLE_SIZE] = '\0';
+    // Artist (bytes 33–62)
+    memcpy(tag->artist, buffer + 33, ID3V1_ARTIST_SIZE);
+    tag->artist[ID3V1_ARTIST_SIZE] = '\0';
+    // Album (bytes 63–92)
+    memcpy(tag->album,  buffer + 63, ID3V1_ALBUM_SIZE);
+    tag->album[ID3V1_ALBUM_SIZE] = '\0';
+    // Year (bytes 93–96)
+    memcpy(tag->year,   buffer + 93, ID3V1_YEAR_SIZE);
+    tag->year[ID3V1_YEAR_SIZE] = '\0';
+    // Read genre byte (last byte of 128-byte ID3v1 tag)
+    tag->genre = buffer[127];
+     printf("Successfully read tag for %s\n", tag->title);
+    return 1;
+   
+
 }
+
 void search_tag(int client_fd, const char *command) {
     // Expected format: "search <album/artist/year/genre> <value>"
     char tag_type[16], value[64];
-    int code = 0;
-    if (sscanf(command, "search %15s %63[^\n]", tag_type, value) != 2) { // Parse command to extract tag type and value
-        code = ERR_PARSE;
-        send(client_fd, &code, sizeof(code), 0);
-        return;
-    }
-
-    // Open the music directory
-    FILE *fp;
-    struct ID3v1Tag tag;
-    char filepath[256];
+    int response = 0;
     int found = 0;
 
-    // Check if the directory exists   
-    DIR *dir = opendir("music");
-    if (!dir) {
-        code = ERR_FILE_NOT_FOUND;
-        send(client_fd, &code, sizeof(code), 0);
+    if (sscanf(command, "search %15s %63[^\n]", tag_type, value) != 2) { // Parse command to extract tag type and value
+        response = ERR_PARSE;
+        send(client_fd, &response, sizeof(response), 0);
         return;
     }
 
-    struct dirent *entry;
-    while ((entry = readdir(dir)) != NULL) {
-        // Only process .mp3 files
-        if (strstr(entry->d_name, ".mp3")) {
-            snprintf(filepath, sizeof(filepath), "music/%.240s", entry->d_name); // 240 is a prefix to not to overflow the buffer filepath, even if d_name is max size. Warning was raised by compiler
-            fp = fopen(filepath, "rb");
-            if (!fp) continue; // Skip if file cannot be opened
-            // Check if the file is at least 128 bytes long
-            if (fseek(fp, -ID3V1_TAG_SIZE, SEEK_END) != 0) { //put pointer to the last 128 bytes and check if file is at least 128 bytes long
-                fclose(fp);
-                continue;
-            }
-            unsigned char buffer[ID3V1_TAG_SIZE];
-            if (fread(buffer, 1, ID3V1_TAG_SIZE, fp) != ID3V1_TAG_SIZE) { // Read the last 128 bytes
-                fclose(fp);
-                continue;
-            }
-            fclose(fp);
-            if (memcmp(buffer, "TAG", 3) != 0) continue;
-            memset(&tag, 0, sizeof(tag));
-            memcpy(tag.title,  buffer + 3,  ID3V1_TITLE_SIZE);
-            tag.title[ID3V1_TITLE_SIZE] = '\0';
-            memcpy(tag.artist, buffer + 33, ID3V1_ARTIST_SIZE);
-            tag.artist[ID3V1_ARTIST_SIZE] = '\0';
-            memcpy(tag.album,  buffer + 63,  ID3V1_ALBUM_SIZE);
-            tag.album[ID3V1_ALBUM_SIZE] = '\0';
-            memcpy(tag.year,   buffer + 93, ID3V1_YEAR_SIZE);
-            tag.year[ID3V1_YEAR_SIZE] = '\0';
-            tag.genre = buffer[127];
-           
-            int match = 0;
-            if (strcasecmp(tag_type, "album") == 0 && strcasecmp(tag.album, value) == 0) match = 1;
-            else if (strcasecmp(tag_type, "artist") == 0 && strcasecmp(tag.artist, value) == 0) match = 1;
-            else if (strcasecmp(tag_type, "year") == 0 && strcasecmp(tag.year, value) == 0) match = 1;
-            else if (strcasecmp(tag_type, "genre") == 0 && (tag.genre == (unsigned char)atoi(value)||
-          strcasecmp(get_genre_name(tag.genre), value) == 0)) match = 1; // Compare genre as integer, atoi convert ASCII to Integer
-            
-            // If a match is found, send the song name
-            if (match) {
-                found = 1;
-                // Send song name
-                send(client_fd, &code, sizeof(code), 0);
-                send(client_fd, entry->d_name, strlen(entry->d_name) + 1, 0);
-            }
+     // Send initial OK response
+    send(client_fd, &response, sizeof(response), 0);
+        printf("[DEBUG] Song count '%d'\n", song_count);
+    for (int i = 0; i < song_count; i++) {
+        struct ID3v1Tag *tag = &song_index[i].tag;
+        int match = 0;
+        printf("[DEBUG] Searching in song: %s\n", song_index[i].filename);
+        if (strcasecmp(tag_type, "album") == 0 && strcasecmp(tag->album, value) == 0)
+            match = 1;
+        else if (strcasecmp(tag_type, "artist") == 0 && strcasecmp(tag->artist, value) == 0)
+            match = 1;
+        else if (strcasecmp(tag_type, "year") == 0 && strcasecmp(tag->year, value) == 0)
+            match = 1;
+        else if (strcasecmp(tag_type, "genre") == 0 && (tag->genre == (unsigned char)atoi(value) || strcasecmp(get_genre_name(tag->genre), value) == 0))
+            match = 1;
+        
+        if (match) {
+            found = 1;
+            send(client_fd, song_index[i].filename, strlen(song_index[i].filename) + 1, 0);
         }
     }
-    closedir(dir);
-    // If no matching tags were found, send an error code
-    code = found ? OK : ERR_TAG_NOT_FOUND; // If found, send OK, otherwise send error code (condition ? value_if_true : value_if_false)
+
+    if (found == 0) {
+        response = ERR_TAG_NOT_FOUND;
+        send(client_fd, &response, sizeof(response), 0);
+        return;   
+    }               
+         
     send(client_fd, "END\n", 4, 0);
     
 }
@@ -175,8 +132,8 @@ const char* get_genre_name(unsigned char genre) {
 
  void handle_changetag(int client_fd, const char *command, const char *role){
     int respond = 0;
-    char filename[128], tag_type[16], new_value[64];
-    char filepath[256];
+    char filename[256], tag_type[16], new_value[64];
+    char filepath[512];
     struct ID3v1Tag tag;
     printf("[DEBUG] Role: '%s'\n", role);
     // Check for admin role
@@ -187,7 +144,7 @@ const char* get_genre_name(unsigned char genre) {
     }
     printf("[DEBUG] Entered handle_changetag()\n");
     // Parse command to extract filename, tag type and new value
-    if (sscanf(command + 10, "%127s %15s %63[^\n]", filename, tag_type, new_value) != 3) {
+    if (sscanf(command + 10, "%255s %15s %63[^\n]", filename, tag_type, new_value) != 3) {
         respond = ERR_PARSE;
         send(client_fd, &respond, sizeof(respond), 0);
         return;
@@ -288,3 +245,39 @@ const char* get_genre_name(unsigned char genre) {
     send(client_fd, &tag, sizeof(tag), 0);      // Send updated tag data back to client
     memset(&tag, 0, sizeof(tag)); // Clear the tag structure to avoid memory leaks
  }
+
+
+ void index_songs(const char *music_dir) {
+    printf("[DEBUG] Indexing songs in directory: %s\n", music_dir);
+    DIR *dir = opendir(music_dir);
+    struct dirent *entry;
+    song_count = 0;
+
+    if (!dir) {
+        perror("Failed to open music directory");
+        return;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        if (strstr(entry->d_name, ".mp3")) {
+            struct ID3v1Tag tag;
+            char path[512];
+            snprintf(path, sizeof(path), "%s/%s", music_dir, entry->d_name);
+            path[sizeof(path) - 1] = '\0';path[sizeof(path) - 1] = '\0'; // Ensure null termination
+
+            if (read_id3v1_tag(path, &tag)) {
+                strncpy(song_index[song_count].filename, entry->d_name, sizeof(song_index[song_count].filename));
+                song_index[song_count].tag = tag;
+                song_count++;
+                printf("Indexing file: %s\n", entry->d_name);
+
+            }
+            if (song_count >= MAX_SONGS) {
+            fprintf(stderr, "ERROR: song_index full. Last song %s\n", entry->d_name);
+            break;
+            }
+        }
+    }
+
+    closedir(dir);
+}

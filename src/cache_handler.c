@@ -5,7 +5,7 @@
 
 
 int check_cache(const char *filename){
-    char filepath[256];
+    char filepath[512];
     snprintf(filepath, sizeof(filepath), "client_music/%s", filename);
     
 

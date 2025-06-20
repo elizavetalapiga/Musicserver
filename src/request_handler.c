@@ -64,7 +64,7 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
       return;
       }
     else if (strncasecmp(command, "INFO ", 5) == 0) {
-      read_id3v1_tag(client_fd, command);
+      handle_info(client_fd, command + 5);
       return;
       }
     else if (strncasecmp(command, "SEARCH ", 7) == 0) {
@@ -97,27 +97,18 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
 }
 
 void handle_list(int client_fd){
-  DIR *dir = opendir("music/");
   char buffer[512];
-  int respond = 0;
-  if (dir == NULL) {
-    perror("opendir failed");
-    respond = ERR_FILE_OPEN_FAIL;
-    send(client_fd, &respond, sizeof(respond), 0);
-    return;// exit the function
-  }
-  respond = OK;
+  int respond = OK;
+
   send(client_fd, &respond, sizeof(respond), 0);
 
-  struct dirent *entry;
-  while ((entry = readdir(dir)) != NULL) {
-    if (entry->d_type == DT_REG)
-    memset(buffer, 0, sizeof(buffer));
-    snprintf(buffer, sizeof(buffer), "%s\n", entry->d_name);
-    send(client_fd, buffer, strlen(buffer), 0);
+  for (int i = 0; i < song_count; i++) {
+      snprintf(buffer, sizeof(buffer), "%s\n", song_index[i].filename);
+      send(client_fd, buffer, strlen(buffer), 0);
   }
+  // Send end marker
   send(client_fd, "END\n", 4, 0);
-  closedir(dir);
+  
 }
 
 void handle_get (int client_fd, const char *filename) {
@@ -219,8 +210,8 @@ int handle_login(int client_fd, const char *command, char *role_out, char *usern
 void handle_add(int client_fd, const char *command, const char *role) {
   int respond = 0;
   int fd;
-  char filename[128];
-  char filepath[256];
+  char filename[256];
+  char filepath[512];
   long filesize = 0;
   char buffer[1024];
   long received = 0;
@@ -236,7 +227,7 @@ void handle_add(int client_fd, const char *command, const char *role) {
   }
 
   //check the song name absence and parsing the songname in variable
-  if (sscanf(command + 4, "%127s", filename) != 1) {
+  if (sscanf(command + 4, "%255s", filename) != 1) {
       respond = ERR_FILE_NOT_FOUND;
       send(client_fd, &respond, sizeof(respond), 0);
       return;
@@ -318,8 +309,8 @@ printf("[DEBUG] Adding file: %s\n", filename);
 
 void handle_delete(int client_fd, const char *command, const char *role) {
   int respond = 0;
-  char filename[128];
-  char filepath[256];
+  char filename[256];
+  char filepath[512];
   
   //check for admin role
   if (strcmp(role, "admin") != 0) {
@@ -329,7 +320,7 @@ void handle_delete(int client_fd, const char *command, const char *role) {
   }
 
   //check the song name absence and parsing the songname in variable
-  if (sscanf(command + 7, "%127s", filename) != 1) {
+  if (sscanf(command + 7, "%255s", filename) != 1) {
       respond = 0;
       send(client_fd, &respond, sizeof(respond), 0);
       return;
@@ -348,7 +339,7 @@ void handle_delete(int client_fd, const char *command, const char *role) {
 void handle_rename(int client_fd, const char *command, const char *role) {
 int respond;
 int fd;
-char old_name [128], new_name [128], old_path [256], new_path [256];
+char old_name [256], new_name [256], old_path [512], new_path [512];
 
 //check for admin role
 if (strcmp(role, "admin") != 0) {
@@ -358,7 +349,7 @@ if (strcmp(role, "admin") != 0) {
 }
 
 //check the song name absence and parsing the songname in variable
-if (sscanf(command + 7, "%127s %127s", old_name, new_name) != 2) {
+if (sscanf(command + 7, "%255s %255s", old_name, new_name) != 2) {
     respond = ERR_GENERIC;
     send(client_fd, &respond, sizeof(respond), 0);
     return;
@@ -454,13 +445,48 @@ send(client_fd, &respond, sizeof(respond), 0);
 
 }
 
+void handle_info(int client_fd, const char *filename) {
+    int found = 0;
+    int response;
+
+    for (int i = 0; i < song_count; i++) {
+        if (strcmp(song_index[i].filename, filename) == 0) {// Check if song matches
+            // Prepare the tag information to send
+            struct ID3v1Tag *tag = &song_index[i].tag; //put matched song in tag structure
+            response = OK; // Set response code to OK
+            send(client_fd, &response, sizeof(response), 0);
+            char buffer[512];  // adjust size as needed
+            snprintf(buffer, sizeof(buffer),
+              "Title: %s\n"
+              "Artist: %s\n"
+              "Album: %s\n"
+              "Year: %s\n"
+              "Genre: %d (%s)\n",
+              tag->title,
+              tag->artist,
+              tag->album,
+              tag->year,
+              tag->genre,
+              get_genre_name(tag->genre));
+            send(client_fd, buffer, strlen(buffer) + 1, 0);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        response = ERR_FILE_NOT_FOUND;
+        send(client_fd, &response, sizeof(response), 0);
+    }
+}
+
 void handle_rate(int client_fd, const char *args, const char *user) {
-    char songname[128];
+    char songname[256];
     int rating;
     
     
   
-    if (sscanf(args, "%127s %d", songname, &rating) != 2 || rating < 1 || rating > 5) { //check if comand is valid
+    if (sscanf(args, "%255s %d", songname, &rating) != 2 || rating < 1 || rating > 5) { //check if comand is valid
         dprintf(client_fd, "ERR Invalid usage. Use: RATE <song> <1-5>\n");
         return;
     }
@@ -474,9 +500,9 @@ void handle_rate(int client_fd, const char *args, const char *user) {
 
 
 void handle_avg(int client_fd, const char *args) {
-    char songname[128];
+    char songname[256];
 
-    if (sscanf(args, "%127s", songname) != 1) {
+    if (sscanf(args, "%255s", songname) != 1) {
         dprintf(client_fd, "ERR Usage: AVG <songname>\n");
         return;
     }
@@ -490,9 +516,9 @@ void handle_avg(int client_fd, const char *args) {
 }
 
 void handle_dlcount(int client_fd, const char *args) {
-    char songname[128];
+    char songname[256];
 
-    if (sscanf(args, "%127s", songname) != 1) {
+    if (sscanf(args, "%255s", songname) != 1) {
         dprintf(client_fd, "ERR Usage: DLCOUNT <song>\n");
         return;
     }

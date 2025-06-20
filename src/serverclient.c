@@ -8,7 +8,7 @@
 int main() {
   int sock_fd = 0;
   struct  sockaddr_in server_addr;
-  char command[512], filename[128];
+  char command[1024], filename[256];
   char ip[64];
   int port;
 
@@ -83,7 +83,7 @@ int main() {
 
     //add function call
     if (strncasecmp(command, "ADD ", 4) == 0) {      
-      sscanf(command + 4, "%127s", filename);
+      sscanf(command + 4, "%255s", filename);
       handle_snd_add(sock_fd, filename);
       continue;  
     }
