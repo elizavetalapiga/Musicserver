@@ -129,7 +129,7 @@ void handle_get (int client_fd, const char *filename) {
   long filesize = 0;
   // Trim newline, since const was passed we cannot change filename directly
   strncpy(local_filename, filename, sizeof(local_filename)-1); //-1 to leave the room for \0
-  local_filename[sizeof(local_filename)-1] = '\0';  // safety null
+  local_filename[sizeof(local_filename)-1] = '\0';  // safety null(if the filename bigger then buffer anyway it will end with \0)
   local_filename[strcspn(local_filename, "\n")] = '\0';
 
   //building the path

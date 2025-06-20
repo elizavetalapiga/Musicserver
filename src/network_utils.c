@@ -34,7 +34,29 @@ void configure_client(struct sockaddr_in *server_addr, int port, const char *ser
   server_addr->sin_family = AF_INET;
   server_addr->sin_port = htons(port);
 
-  if (inet_pton(AF_INET, server_ip, &server_addr->sin_addr) <= 0){
-    handle_error("Invalid client target IP address");
+  if (inet_pton(AF_INET, server_ip, &server_addr->sin_addr) <= 0){    
+    handle_error("Invalid server IP address\n");
   }
+}
+
+int load_config(char *ip_buffer, size_t ip_buf_size, int *port_out) {
+    FILE *file = fopen("config.txt", "r");
+    if (!file) {
+        perror("Failed to open config file");
+        return 0;
+    }
+
+    char line[128];
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "IP=", 3) == 0) {
+            strncpy(ip_buffer, line + 3, ip_buf_size - 1);
+            ip_buffer[strcspn(ip_buffer, "\n")] = '\0';  // trim newline
+            ip_buffer[strcspn(ip_buffer, "\r\n")] = '\0'; // trims both \n and \r
+        } else if (strncmp(line, "PORT=", 5) == 0) {
+            *port_out = atoi(line + 5);
+        }
+    }
+
+    fclose(file);
+    return 1;
 }

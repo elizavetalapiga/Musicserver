@@ -3,7 +3,7 @@
 #include "network_utils.h"
 #include "request_handler.h"
 
-#define PORT 8080
+
 
 
 int main(){
@@ -17,11 +17,15 @@ int main(){
   int opt = 1;
   char role[64] = "";  // store role for this client
   char username[64] = "";
+  char ip[64];
+  int port;
 
-
+  if (!load_config(ip, sizeof(ip), &port)) {
+      exit(EXIT_FAILURE);
+  }
 
   // Server config
-  configure_server(&server_addr, 8080, NULL);  // Bind to all interfaces
+  configure_server(&server_addr, port, NULL);  // Bind to all interfaces
 
   // Socket creation + Error handeling
   sock_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -46,7 +50,7 @@ int main(){
     handle_error("listen failed");
     }
 
-  printf("Server is listening on port %d \n", PORT);
+  printf("Server is listening on port %d \n", port);
 
   // SIGCHLD - Signal that a child process has terminated or changed state; SIG_IGN - Ignore this signal. Against zombi processes
   signal(SIGCHLD, SIG_IGN);

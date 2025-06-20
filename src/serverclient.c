@@ -3,22 +3,23 @@
 #include "login_client.h"
 #include "cache_handler.h"
 
-#define PORT 8080
-#define IP_SERVER "127.0.0.1"
 
 
 int main() {
   int sock_fd = 0;
   struct  sockaddr_in server_addr;
   char command[512], filename[128];
+  char ip[64];
+  int port;
+
+  if (!load_config(ip, sizeof(ip), &port)) {
+      exit(EXIT_FAILURE);
+  }
+
   
-
-  // Create a socket + error handeling
+  // Create a socket 
   sock_fd = create_socket();
-
-
-  configure_client(&server_addr, PORT, IP_SERVER);
-
+  configure_client(&server_addr, port, ip);
 
   // Connect to server
   if (connect(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1){
