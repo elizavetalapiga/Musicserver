@@ -331,8 +331,22 @@ void handle_delete(int client_fd, const char *command, const char *role) {
   printf("[DEBUG] Trying to delete: %s\n", filepath);
 
   //removing file, sending the respond
-  respond = (remove(filepath) == 0) ? OK : ERR_GENERIC;
-  send(client_fd, &respond, sizeof(respond), 0);
+  if (remove(filepath) == 0) {
+    respond = OK;
+    send(client_fd, &respond, sizeof(respond), 0);
+    if (!delete_song_db_entries(filename)) {
+        respond = ERR_GENERIC;
+        send(client_fd, &respond, sizeof(respond), 0);
+    }
+
+    if (!remove_song_from_index(filename)) {
+        respond = ERR_GENERIC;
+        send(client_fd, &respond, sizeof(respond), 0);
+    }
+  } else {
+    respond = ERR_FILE_NOT_FOUND;
+    send(client_fd, &respond, sizeof(respond), 0);
+  }
   return;
 }
 
@@ -491,6 +505,11 @@ void handle_rate(int client_fd, const char *args, const char *user) {
         return;
     }
 
+    if (!song_exists(songname)) {
+    dprintf(client_fd, "ERR Song '%s' does not exist.\n", songname);
+    return;
+    }
+
     if (rate_song(songname, user, rating)) {
         dprintf(client_fd, "OK Rating saved for '%s'.\n", songname);
     } else {
@@ -506,6 +525,11 @@ void handle_avg(int client_fd, const char *args) {
         dprintf(client_fd, "ERR Usage: AVG <songname>\n");
         return;
     }
+
+    if (!song_exists(songname)) {
+    dprintf(client_fd, "ERR Song '%s' does not exist.\n", songname);
+    return;
+      }
 
     float avg = get_average_rating(songname);
     if (avg < 0) {
@@ -523,10 +547,40 @@ void handle_dlcount(int client_fd, const char *args) {
         return;
     }
 
+    if (!song_exists(songname)) {
+    dprintf(client_fd, "ERR Song '%s' does not exist.\n", songname);
+    return;
+      }
+
     int count = get_download_count(songname);
     if (count >= 0) {
         dprintf(client_fd, "Download count for '%s': %d\n", songname, count);
     } else {
         dprintf(client_fd, "ERR Could not retrieve download count.\n");
     }
+}
+
+int song_exists(const char *songname) {
+    for (int i = 0; i < song_count; ++i) {
+        if (strcmp(song_index[i].filename, songname) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int remove_song_from_index(const char *filename) {
+    for (int i = 0; i < song_count; ++i) {
+        if (strcmp(song_index[i].filename, filename) == 0) {
+            // Shift songs left
+            for (int j = i; j < song_count - 1; ++j) {
+                song_index[j] = song_index[j + 1];
+            }
+            song_count--;
+            printf("[DEBUG] '%s' removed from song_index[]\n", filename);
+            return 1;
+        }
+    }
+    printf("[DEBUG] Song '%s' not found in index.\n", filename);
+    return 0;
 }

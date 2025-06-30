@@ -10,7 +10,12 @@ int init_database(const char *filename) {
         fprintf(stderr, "Failed to open database: %s\n", sqlite3_errmsg(db)); // Print error message if opening fails on server side
         return 0;
     }
+
+    // wait when the DB is locked, instead of instantly failing
+    sqlite3_busy_timeout(db, 3000); // waits up to 3s
+
     return 1;
+
 }
 // Closes the database when the server exits. Prevents memory leaks and file locking issues.
 void close_database() {
@@ -50,6 +55,7 @@ float get_average_rating(const char *song) {
     }
 
     sqlite3_finalize(stmt);
+    printf("[DEBUG] Getting average rating for song: %f\n", avg); 
     return avg;
 }
 
@@ -84,4 +90,32 @@ printf("[DEBUG] Getting download count for song: %s\n", song); //Debugging outpu
 
     sqlite3_finalize(stmt);
     return count; // Returns the download count for the specified song, or -1 if not found
+}
+
+// Deletes all database entries related to a song, including ratings and download counts
+int delete_song_db_entries(const char *song) {
+    const char *sql[] = {
+        "DELETE FROM ratings WHERE song = ?;",
+        "DELETE FROM downloads WHERE song = ?;"        
+    };
+
+    sqlite3_stmt *stmt;
+    for (size_t i = 0; i < sizeof(sql) / sizeof(sql[0]); ++i) {
+        if (sqlite3_prepare_v2(db, sql[i], -1, &stmt, NULL) != SQLITE_OK) {
+            fprintf(stderr, "Failed to prepare delete: %s\n", sqlite3_errmsg(db));
+            return 0;
+        }
+
+        sqlite3_bind_text(stmt, 1, song, -1, SQLITE_STATIC);
+
+        if (sqlite3_step(stmt) != SQLITE_DONE) {
+            fprintf(stderr, "Failed to execute delete for: %s\n", song);
+            sqlite3_finalize(stmt);
+            return 0;
+        }
+
+        sqlite3_finalize(stmt);
+    }
+
+    return 1;  // All deletes succeeded
 }

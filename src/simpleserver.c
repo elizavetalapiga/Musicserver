@@ -58,10 +58,6 @@ int main(){
   // SIGCHLD - Signal that a child process has terminated or changed state; SIG_IGN - Ignore this signal. Against zombi processes
   signal(SIGCHLD, SIG_IGN);
 
-  if (!init_database("music.db")) {
-    fprintf(stderr, "Database initialization failed\n");
-    exit(EXIT_FAILURE);
-  }
 
   init_song_index();  // Allocate the dynamic song index
   index_songs("music");  // This will use add_song_to_index()
@@ -82,6 +78,11 @@ int main(){
       if (pid == 0) { //child process
         close(sock_fd);
         
+        if (!init_database("music.db")) {
+          fprintf(stderr, "Database initialization failed\n");
+          exit(EXIT_FAILURE);
+        }
+
         while (1) {
           // clear the array
           memset(command, 0, sizeof(command));
@@ -102,6 +103,7 @@ int main(){
           }
 
         close(client_fd);
+        close_database();
         exit(0);
         } else {
           if (pid > 0)
@@ -111,7 +113,6 @@ int main(){
         }
       }
 
-  free_song_index();  //cleanup song index   
-  close_database();
+  free_song_index();  //cleanup song index     
   return 0;
   }
