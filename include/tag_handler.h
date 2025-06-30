@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define MAX_SONGS 1000
+
 
 struct ID3v1Tag {
     char tag[3];      // "TAG"
@@ -18,10 +18,14 @@ struct SongMetadata {
     struct ID3v1Tag tag;  
 };
 
-extern struct SongMetadata song_index[MAX_SONGS]; // Declares the array of indexed songs defined elsewhere
+
+extern struct SongMetadata *song_index;  // Declares that indexed songs defined elsewhere
 extern int song_count; //Tracks how many entries are in song_index
-
-
+extern int song_capacity;
+//Initialization and cleanup
+void init_song_index();
+void free_song_index();
+void add_song_to_index(struct SongMetadata *new_song);
 
 int read_id3v1_tag(const char *filepath, struct ID3v1Tag *tag);
 void search_tag(int client_fd, const char *command);

@@ -52,30 +52,35 @@ void handle_rcv(int sock_fd, const char *command) {
 }
 
 void handle_rcv_list(int sock_fd) {
-  char buffer[512] = {0};
+  char buffer[512];
+  char line[512];
+  size_t line_len = 0;
   size_t bytes_received;
-  char *end_marker;
   int respond = 0;
 
   if (recv(sock_fd, &respond, sizeof(respond), 0) <= 0) {
     perror("Failed to receive server response");
     return;
     }  
+    
   if (respond != OK) {
     handle_response(respond);  // handle the specific error
     return;  // Exit without entering the loop
   }   
 
-  while ((bytes_received = recv(sock_fd, buffer, sizeof(buffer) - 1, 0)) > 0){
-    buffer[bytes_received] = '\0'; // Null-terminate to use printf
-    end_marker = strstr(buffer, "END\n");
-    if (end_marker != NULL) {
-      *end_marker = '\0';
-      printf("%s", buffer);
-      break;
+  while ((bytes_received = recv(sock_fd, buffer, sizeof(buffer), 0)) > 0){
+    for (ssize_t i = 0; i < bytes_received; ++i) {
+            if (buffer[i] == '\n') {
+                line[line_len] = '\0';
+                if (strcmp(line, "END") == 0) return;
+                printf("%s\n", line);  // each song
+                line_len = 0;  // reset for next line
+            } else if (line_len < sizeof(line) - 1) {
+                line[line_len++] = buffer[i];
+            }
+        }
     }
-    printf("%s\n", buffer);
-     }
+
 
     if (bytes_received <= 0) {
         perror("Error while receiving file list");

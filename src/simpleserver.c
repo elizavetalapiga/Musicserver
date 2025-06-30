@@ -62,7 +62,9 @@ int main(){
     fprintf(stderr, "Database initialization failed\n");
     exit(EXIT_FAILURE);
   }
-  index_songs("music");
+
+  init_song_index();  // Allocate the dynamic song index
+  index_songs("music");  // This will use add_song_to_index()
 
   // (1) - in this case run forver
     while (1) {
@@ -109,6 +111,7 @@ int main(){
         }
       }
 
+  free_song_index();  //cleanup song index   
   close_database();
   return 0;
   }

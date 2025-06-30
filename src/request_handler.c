@@ -103,7 +103,7 @@ void handle_list(int client_fd){
   send(client_fd, &respond, sizeof(respond), 0);
 
   for (int i = 0; i < song_count; i++) {
-      snprintf(buffer, sizeof(buffer), "%s\n", song_index[i].filename);
+      snprintf(buffer, sizeof(buffer), "%s\n", song_index[i].filename);      
       send(client_fd, buffer, strlen(buffer), 0);
   }
   // Send end marker

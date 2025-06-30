@@ -16,9 +16,40 @@
 #define ID3V1_ALBUM_SIZE 30
 #define ID3V1_YEAR_SIZE 4
 
+#define INITIAL_SONG_CAPACITY 100
 
-struct SongMetadata song_index[MAX_SONGS];
+
+struct SongMetadata *song_index = NULL; // Global song index array
 int song_count = 0;
+int song_capacity = 0;
+
+void init_song_index() {
+    song_capacity = INITIAL_SONG_CAPACITY; 
+    song_index = malloc(song_capacity * sizeof(struct SongMetadata));
+    if (!song_index) {
+        perror("Failed to allocate song_index");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void free_song_index() {
+    free(song_index);
+}
+
+
+void add_song_to_index(struct SongMetadata *new_song) {
+    if (song_count >= song_capacity) {
+        int new_capacity = song_capacity * 2; 
+        struct SongMetadata *new_array = realloc(song_index, new_capacity * sizeof(struct SongMetadata));
+        if (!new_array) {
+            perror("Failed to realloc song_index");
+            exit(EXIT_FAILURE);
+        }
+        song_index = new_array;
+        song_capacity = new_capacity;
+    }
+    song_index[song_count++] = *new_song;
+}
 
 
 // Load ID3v1 tag from an MP3 file safely by reading last 128 bytes
@@ -251,33 +282,30 @@ const char* get_genre_name(unsigned char genre) {
     printf("[DEBUG] Indexing songs in directory: %s\n", music_dir);
     DIR *dir = opendir(music_dir);
     struct dirent *entry;
-    song_count = 0;
+    
 
     if (!dir) {
         perror("Failed to open music directory");
         return;
     }
 
-    while ((entry = readdir(dir)) != NULL) {
-        if (strstr(entry->d_name, ".mp3")) {
-            struct ID3v1Tag tag;
-            char path[512];
-            snprintf(path, sizeof(path), "%s/%s", music_dir, entry->d_name);
-            path[sizeof(path) - 1] = '\0';path[sizeof(path) - 1] = '\0'; // Ensure null termination
+    while ((entry = readdir(dir)) != NULL) {// Read each entry in the directory
+    if (strstr(entry->d_name, ".mp3")) {// Check if the file is an MP3
+        struct ID3v1Tag tag;
+        char path[512];
+        snprintf(path, sizeof(path), "%s/%s", music_dir, entry->d_name);
 
-            if (read_id3v1_tag(path, &tag)) {
-                strncpy(song_index[song_count].filename, entry->d_name, sizeof(song_index[song_count].filename));
-                song_index[song_count].tag = tag;
-                song_count++;
-                printf("Indexing file: %s\n", entry->d_name);
+        if (read_id3v1_tag(path, &tag)) {
+            struct SongMetadata new_song;
+            strncpy(new_song.filename, entry->d_name, sizeof(new_song.filename));
+            new_song.filename[sizeof(new_song.filename) - 1] = '\0';  // Always null-terminate
+            new_song.tag = tag;// Copy the tag data into the new song structure
 
-            }
-            if (song_count >= MAX_SONGS) {
-            fprintf(stderr, "ERROR: song_index full. Last song %s\n", entry->d_name);
-            break;
-            }
+            add_song_to_index(&new_song);
+
+            printf("Indexing file: %s\n", entry->d_name);
         }
     }
-
+}
     closedir(dir);
 }
