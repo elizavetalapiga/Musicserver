@@ -253,7 +253,7 @@ void handle_add(int client_fd, const char *command, const char *role) {
       send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
-
+printf("[DEBUG] File size received: %ld bytes\n", filesize);
   if (check_disk_space("music", filesize, &disk_space) == 0){
     respond = ERR_DISK_IS_FULL;
     send(client_fd, &respond, sizeof(respond), 0);
@@ -291,9 +291,13 @@ void handle_add(int client_fd, const char *command, const char *role) {
  //recieving file
   while (received < filesize) {
       chunk = recv(client_fd, buffer, sizeof(buffer), 0);
-      if (chunk <= 0) {
+      if (chunk <= 0) {// check for failed read or connection closed
         perror("Recieved failed");
-        break;
+        fclose(file);
+        remove(filepath);
+        respond = ERR_INCOMPLETE_TRANSFER;
+        send(client_fd, &respond, sizeof(respond), 0);
+        return;        
       }
       fwrite(buffer, 1, chunk, file);
       received += chunk;
@@ -301,9 +305,10 @@ void handle_add(int client_fd, const char *command, const char *role) {
 printf("[DEBUG] Adding file: %s\n", filename);
   fclose(file); // unlocks + closes
 
-  // if received == filesize then respond=ok othewise error;
-  respond = (received == filesize) ? OK : ERR_INCOMPLETE_TRANSFER;
-  send(client_fd, &respond, sizeof(respond), 0);
+
+printf("[DEBUG] File '%s' received, total bytes: %ld\n", filename, received);
+send(client_fd, &respond, sizeof(respond), 0);
+
 }
 
 

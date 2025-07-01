@@ -146,12 +146,8 @@ void handle_play(const char *filename) {
 
 void handle_snd_add(int sock_fd, const char *filename){
   char path[512];
-  int response = 0; 
-  FILE *file;
-  long filesize;
-  char buffsndr[1024];
-  size_t reads_bytes;
- 
+  int response = 0;  
+  int state;
    
   snprintf(path, sizeof(path), "client_music/%s", filename);
 
@@ -159,37 +155,68 @@ void handle_snd_add(int sock_fd, const char *filename){
     handle_error("No response or connection closed");
     return; 
     }
-
-  if (response == ERR_FILE_EXISTS) {
+  
+  if (response != OK) {
       handle_response(response);  
       return;  
     } 
 
-  if ((file = fopen(path, "rb")) == NULL) {
-       handle_error("File opening failed");
+    printf("[DEBUG] Sending file: %s\n", path); 
+  state = send_file(sock_fd, path);
+  if (state <= 0) {
+      printf("Resending the file\n");
+      state = send_file(sock_fd, path);
+      if (state != OK)
+          printf("Resending failed\n");
   }
- 
-  
+       printf("[DEBUG] File '%s' sent with state: %d\n", filename, state);
+  return;  
+}
 
+  int send_file(int sock_fd, const char *filename) {
+    size_t reads_bytes;
+    int response = 0;
+    long filesize;
+    char buffsndr[1024];
+
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL) {
+       perror("File opening failed");
+       return -1;
+  } 
+printf("[DEBUG] Sending file2.0: %s\n", filename);
   //filesize collection ans sending in order to stop the loop on client side
   fseek(file, 0, SEEK_END);
   filesize = ftell(file);
   rewind(file); //reset pointer to the begining of file
   send(sock_fd, &filesize, sizeof(filesize), 0);
-
+printf("[DEBUG] Sending filesize: %ld\n", filesize);
 
   // Sending chunks + Error handeling
   while ((reads_bytes = fread(buffsndr, 1, sizeof(buffsndr), file)) > 0){
-    if ((send(sock_fd, buffsndr, reads_bytes, 0)) == -1)
+    if ((send(sock_fd, buffsndr, reads_bytes, 0)) == -1){
       perror("Add failed");
+      return -1;  
+    }   
+  }
+printf ("[DEBUG] File was sent: %s\n", filename);
+  fclose(file);
+
+  if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
+  perror("No response or connection closed");
+  return -1; 
   }
 
-
-  if (recv(sock_fd, &response, sizeof(response), 0) > 0){
-   handle_response(response);
-  } 
-    fclose(file);   
+  if (response == ERR_INCOMPLETE_TRANSFER) {
+    handle_response(response);
+    return 0;
+  } else if (response == OK) {
+    handle_response(response);
+    return 1;
   }
+  return -1; 
+}
+
 
   void handle_rcv_delete(int sock_fd, const char *filename) {
     int response = 0;
@@ -213,7 +240,7 @@ void handle_snd_add(int sock_fd, const char *filename){
     printf("%s was deleted on server and client side\n", filename);
   } else {
     printf("[INFO] '%s' deleted on server, but not found in local cache.\n", filename);
-}
+    }
 }
 
 
