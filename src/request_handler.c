@@ -28,7 +28,7 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
     if (strcasecmp(command, "LOGOUT") == 0) {
         *logged_in = 0;
         int respond = OK;
-        send(client_fd, &respond, sizeof(respond), 0);  // send int, not string       
+        send(client_fd, &respond, sizeof(respond), 0);     
         return;
     }
 

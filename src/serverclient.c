@@ -46,7 +46,7 @@ int main() {
       "login <user> <pass> - log into account\n"
       "info <song_name> - tag info query\n"
       "search <album/artist/year/genre> <value> - search for songs by tag\n"
-      "rate <song_name> - rate the song\n"
+      "rate <song_name> <1-5> - rate the song\n"
       "avg <song_name> - rating statisctics\n"
       "dlcount <song_name> - downloading statistics\n"
       "For admin:\n"
