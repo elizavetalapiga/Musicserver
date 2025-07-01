@@ -95,17 +95,28 @@ char path[512] = {0};
 long filesize;
 long received_total = 0;
 long disk_space = 0;
+int response;
+
+
+  //reciving response
+  recv(sock_fd, &response, sizeof(response), 0);
+  if (response != OK) {
+  handle_response(response);
+  return;
+  }
 
   //reciving filesize or error
   recv(sock_fd, &filesize, sizeof(filesize), 0);
   if (filesize == -1) {
-  handle_response(ERR_FILE_NOT_FOUND);
+  handle_response(ERR_GENERIC);
   return;
   }
 
   if (check_disk_space("client_music", filesize, &disk_space) == 0){
     printf("Not enough disk space to save the file, total available space: %ld bytes.\n", disk_space);
     printf("File '%ld' not saved.\n", filesize);
+    response = ERR_DISK_IS_FULL;
+    send(sock_fd, &response, sizeof(response), 0); 
     return;
   }
 
@@ -116,26 +127,33 @@ long disk_space = 0;
   // opening directory
   FILE *fp = fopen(path, "wb");
   if (!fp) {
-        perror("File open failed");
-        return;
+    response = ERR_FILE_OPEN_FAIL;
+    send(sock_fd, &response, sizeof(response), 0); 
+    return;
     }
 
-    //recieving file
-    while (received_total < filesize) {
-      bytes_received = recv(sock_fd, buffer, sizeof(buffer), 0);
-      if (bytes_received <= 0){
-        perror("Recieve failed");
-        break;
-      }
+  response = OK;
+  send(sock_fd, &response, sizeof(response), 0);
 
-      fwrite(buffer, 1, bytes_received, fp);
-      received_total += bytes_received;
+  //recieving file
+  while (received_total < filesize) {
+    bytes_received = recv(sock_fd, buffer, sizeof(buffer), 0);
+    if (bytes_received <= 0){
+    perror("Recieved failed");
+      fclose(fp);
+      remove(path);
+      printf("File transfer incomplete, file '%s' not saved. Try again\n", filename);
+      return; 
     }
 
-    fclose(fp);
-    printf("File received: %ld bytes\n", received_total);  
-    handle_play(filename); //play the song after recieving it    
-    }
+    fwrite(buffer, 1, bytes_received, fp);
+    received_total += bytes_received;
+  }
+
+  fclose(fp);
+  printf("File received: %ld bytes\n", received_total);  
+  handle_play(filename); //play the song after recieving it    
+  }
 
 void handle_play(const char *filename) {
     char play_cmd[512]; // buffer for the command to play a song
@@ -152,7 +170,7 @@ void handle_snd_add(int sock_fd, const char *filename){
   snprintf(path, sizeof(path), "client_music/%s", filename);
 
   if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
-    handle_error("No response or connection closed");
+    printf("No response or connection closed");
     return; 
     }
   
@@ -223,7 +241,7 @@ printf ("[DEBUG] File was sent: %s\n", filename);
     char filepath[512];
 
     if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
-    handle_error("No response or connection closed");
+    printf("No response or connection closed");
     return;
       }
     if (response != OK) {
@@ -427,6 +445,10 @@ void handle_response(int response) {
     case ERR_DISK_IS_FULL:
     printf("Error: Not enough space on a disk\n");
       break;
+    case ERR_LOCK_FAILED:
+    printf("Error: Failed to lock the file\n");
+      break;
   }
+
 
 }

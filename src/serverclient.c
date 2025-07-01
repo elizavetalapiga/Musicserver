@@ -23,7 +23,7 @@ int main() {
 
   // Connect to server
   if (connect(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1){
-    handle_error("Connection failed");
+    printf("Connection failed");
     }
 
   printf("Connected to the server\n");
@@ -77,7 +77,7 @@ int main() {
 
     // Sends commands
     if ((send(sock_fd , command, strlen(command), 0)) == -1){
-      handle_error("Send failed");
+      printf("Send failed");
       break;
     }
 

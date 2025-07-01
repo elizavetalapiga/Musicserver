@@ -130,21 +130,17 @@ void handle_get (int client_fd, const char *filename) {
 
   // Open the file descriptor
   int fd = open(path, O_RDONLY);
-  if (fd < 0) {
-      perror("open failed");
-      filesize = -1;
-      send(client_fd, &filesize, sizeof(filesize), 0);
-      handle_error("File not found or inaccessible");
+  if (fd < 0) {      
+      respond = ERR_GENERIC;
+      send(client_fd, &respond, sizeof(respond), 0);      
       return;
   }
 
     // Appling the shared lock to allow safe concurrent reading
   if (flock(fd, LOCK_SH) < 0) {
-      perror("LOCK_SH failed");
       close(fd);
-      filesize = -1;
-      send(client_fd, &filesize, sizeof(filesize), 0);
-      handle_error("Failed to lock file for reading");
+      respond = ERR_LOCK_FAILED;
+      send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
 
@@ -152,10 +148,13 @@ void handle_get (int client_fd, const char *filename) {
   FILE *file =  fdopen(fd, "rb");
   if (!file) {
     close(fd);
-    filesize = -1;
-    send(client_fd, &filesize, sizeof(filesize), 0);
-    handle_error("File opening failed");   
+    respond = ERR_FILE_OPEN_FAIL;
+    send(client_fd, &respond, sizeof(respond), 0); 
+    return;
   }
+
+  respond = OK;
+  send(client_fd, &respond, sizeof(respond), 0);
 
   //filesize collection ans sending in order to stop the loop on client side
   fseek(file, 0, SEEK_END);
@@ -163,12 +162,17 @@ void handle_get (int client_fd, const char *filename) {
   rewind(file); //reset pointer to the begining of file
   send(client_fd, &filesize, sizeof(filesize), 0);
 
+
+  //reciving respond
+  recv(client_fd, &respond, sizeof(respond), 0);
+  if (respond != OK) {
+  perror("Error occured");
+  return;
+  }
   
   // Sending chunks + Error handeling
   while ((reads_bytes = fread(buffsndr, 1, sizeof(buffsndr), file)) > 0){
     if ((send(client_fd, buffsndr, reads_bytes, 0)) == -1){
-      respond = ERR_GENERIC;
-    send(client_fd, &respond, sizeof(respond), 0);  
     fclose(file); // releases lock and closes fd
     perror("Send failed");
     return;
@@ -180,6 +184,8 @@ void handle_get (int client_fd, const char *filename) {
   fclose(file);
   increment_download(local_filename);
 }
+
+
 
 int handle_login(int client_fd, const char *command, char *role_out, char *username_out) {
   char username[64], password[64];

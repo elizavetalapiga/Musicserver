@@ -15,7 +15,7 @@ int main(){
   pid_t pid;
   char command[1024];
   int logged_in = 0;
-  int opt = 1;
+  int opt = 1; // Allow socket to be reused
   char role[64] = "";  // store role for this client
   char username[64] = "";
   char ip[64];
@@ -47,7 +47,7 @@ int main(){
     // Listen for incoming connections
   lstn_res = listen(sock_fd, 3);
 
-      // Error handeling
+  
   if (lstn_res == -1) {
     close(sock_fd);
     handle_error("listen failed");
@@ -68,7 +68,7 @@ int main(){
 
       // Accept traffic + Error handeling
       if ((client_fd = accept(sock_fd, (struct sockaddr *)&client_addr, &addr_len)) == -1) {
-        handle_error("Accept failed");
+        printf("Accept failed");
         continue; // try again
       }
       
@@ -109,7 +109,7 @@ int main(){
           if (pid > 0)
             close(client_fd);
           else
-            handle_error("Fork failed");
+            printf("Fork failed");
         }
       }
 

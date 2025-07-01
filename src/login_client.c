@@ -23,7 +23,7 @@ int client_login(int sock_fd) {
   // Format and send LOGIN command
   snprintf(login_cmd, sizeof(login_cmd), "LOGIN %s %s", username, password);
   if (send(sock_fd, login_cmd, strlen(login_cmd), 0) == -1) {
-      handle_error("Login send failed");
+      printf("Login send failed");
       return 0;
   }
 

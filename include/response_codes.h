@@ -16,5 +16,6 @@
 #define ERR_UNKNOWN_COMMAND 12
 #define ERR_FILE_EXISTS 13
 #define ERR_DISK_IS_FULL 14
+#define ERR_LOCK_FAILED 15
 
 #endif
