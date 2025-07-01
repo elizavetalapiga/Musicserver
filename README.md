@@ -12,7 +12,7 @@ For All Users:
 - login <user> <pass> – Log into the account
 - info <song_name> – Display metadata of the song (tags)
 - search <album/artist/year/genre> <value> – Search for songs using metadata
-- rate <song_name> – Rate the song (e.g., 1 to 5)
+- rate <song_name> <1-5> – Rate the song (e.g., 1 to 5)
 - avg <song_name> – View average rating of a song
 - dlcount <song_name> – View how many times the song has been downloaded
 
