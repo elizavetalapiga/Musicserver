@@ -31,5 +31,6 @@ int read_id3v1_tag(const char *filepath, struct ID3v1Tag *tag);
 void search_tag(int client_fd, const char *command);
 const char* get_genre_name(unsigned char genre);
 void handle_changetag(int client_fd, const char *command, const char *role);
+int changetag_song_in_indexes(const char *filename, const struct ID3v1Tag *new_tag);
  void index_songs(const char *music_dir);
 #endif 

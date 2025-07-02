@@ -44,7 +44,7 @@ void handle_rcv(int sock_fd, const char *command) {
     handle_rcv_dlcount(sock_fd);  // after "DLCOUNT "
     }
       else {
-    int response;
+    int response = ERR_GENERIC;  // Default to generic error if recv fails;
     recv(sock_fd, &response, sizeof(response), 0);
     handle_response(response);        
     }
@@ -56,11 +56,11 @@ void handle_rcv_list(int sock_fd) {
   char line[512];
   size_t line_len = 0;
   size_t bytes_received;
-  int respond = 0;
+  int respond ;
 
   if (recv(sock_fd, &respond, sizeof(respond), 0) <= 0) {
-    perror("Failed to receive server response");
-    return;
+    handle_response(ERR_RESPONSE_RECV_FAIL);
+    exit(EXIT_FAILURE);
     }  
     
   if (respond != OK) {
@@ -83,7 +83,8 @@ void handle_rcv_list(int sock_fd) {
 
 
     if (bytes_received <= 0) {
-        perror("Error while receiving file list");
+        perror("Error while receiving file list\n");
+        return;
     }
   }
 
@@ -99,7 +100,10 @@ int response;
 
 
   //reciving response
-  recv(sock_fd, &response, sizeof(response), 0);
+  if (recv(sock_fd, &response, sizeof(response), 0)== -1) {
+    handle_response(ERR_RESPONSE_RECV_FAIL);
+    exit(EXIT_FAILURE);
+  }
   if (response != OK) {
   handle_response(response);
   return;
@@ -170,8 +174,8 @@ void handle_snd_add(int sock_fd, const char *filename){
   snprintf(path, sizeof(path), "client_music/%s", filename);
 
   if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
-    printf("No response or connection closed");
-    return; 
+    handle_response(ERR_RESPONSE_RECV_FAIL);
+    exit(EXIT_FAILURE); 
     }
   
   if (response != OK) {
@@ -241,8 +245,8 @@ printf ("[DEBUG] File was sent: %s\n", filename);
     char filepath[512];
 
     if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
-    printf("No response or connection closed");
-    return;
+    handle_response(ERR_RESPONSE_RECV_FAIL);
+    exit(EXIT_FAILURE);
       }
     if (response != OK) {
       handle_response(response);
@@ -268,7 +272,7 @@ void handle_rcv_rename(int sock_fd) {
         handle_response(response);
     } else {
         handle_response(ERR_RESPONSE_RECV_FAIL);
-        return;
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -278,7 +282,7 @@ void handle_rcv_newuser(int sock_fd) {
         handle_response(response);
     } else {
         handle_response(ERR_RESPONSE_RECV_FAIL);
-        return;
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -288,8 +292,8 @@ void handle_rcv_tag(int sock_fd) {
     
     // Receive response code
     if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
-        handle_response(ERR_GENERIC);
-        return;
+        handle_response(ERR_RESPONSE_RECV_FAIL);
+        exit(EXIT_FAILURE);
     }
 
     if (response != OK) {
@@ -316,7 +320,7 @@ void handle_search_response(int sock_fd){
 
   if (recv(sock_fd, &respond, sizeof(respond), 0) <= 0) {
     handle_response(ERR_RESPONSE_RECV_FAIL);
-    return;
+    exit(EXIT_FAILURE);
   }  
   if (respond != OK) {
     handle_response(respond);  // handle the specific error
@@ -347,7 +351,7 @@ printf("[DEBUG] Entered handle_rcv_changetag()\n");
   // Receive response code
   if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
     handle_response(ERR_RESPONSE_RECV_FAIL);
-    return;
+    exit(EXIT_FAILURE);
 }
 
 if (response != OK) {
@@ -359,7 +363,7 @@ if (response != OK) {
    // Receive tag data
   if (recv(sock_fd, &tag, sizeof(tag), 0) <= 0) {
     handle_response(ERR_TAG_PARSE_FAIL);
-    return;
+    exit(EXIT_FAILURE);
   }
 
   // Print updated tag information
@@ -383,6 +387,7 @@ void recv_and_print(int sock_fd) {
         printf("Connection closed by server.\n");
     } else {
         handle_response(ERR_RESPONSE_RECV_FAIL);
+        exit(EXIT_FAILURE);
     }
     printf("Debug: Received %d bytes from server.\n", bytes);
 }
@@ -448,6 +453,9 @@ void handle_response(int response) {
     case ERR_LOCK_FAILED:
     printf("Error: Failed to lock the file\n");
       break;
+    case ERR_INVALID_TAG_TYPE:
+    printf("Error: Invalid TAG parameter\n");
+      break;  
   }
 
 

@@ -131,7 +131,7 @@ void handle_get (int client_fd, const char *filename) {
   // Open the file descriptor
   int fd = open(path, O_RDONLY);
   if (fd < 0) {      
-      respond = ERR_GENERIC;
+      respond = ERR_FILE_NOT_FOUND;
       send(client_fd, &respond, sizeof(respond), 0);      
       return;
   }
@@ -402,8 +402,12 @@ if (flock(fd, LOCK_EX) < 0) {
 
 printf("[DEBUG] Rename: %s -> %s\n", old_path, new_path);
 
-
-respond = (rename(old_path, new_path) == 0) ? OK : ERR_GENERIC;
+if (rename(old_path, new_path) == 0) {
+    rename_song_in_indexes(old_name, new_name);  // update index too
+    respond = OK;
+} else {
+    respond = ERR_GENERIC;
+}
 send(client_fd, &respond, sizeof(respond), 0);
 close(fd);  // releases lock
 
@@ -594,4 +598,18 @@ int remove_song_from_index(const char *filename) {
     }
     printf("[DEBUG] Song '%s' not found in index.\n", filename);
     return 0;
+}
+
+int rename_song_in_indexes(const char *old_filename, const char *new_filename) {
+    for (int i = 0; i < song_count; i++) {
+        if (strcmp(song_index[i].filename, old_filename) == 0) {
+            // Found the song, update filename
+            strncpy(song_index[i].filename, new_filename, sizeof(song_index[i].filename) - 1);
+            song_index[i].filename[sizeof(song_index[i].filename) - 1] = '\0'; // null-terminate
+            return 0; // success
+        }
+    }
+
+    // Not found
+    return -1;
 }

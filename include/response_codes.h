@@ -17,5 +17,6 @@
 #define ERR_FILE_EXISTS 13
 #define ERR_DISK_IS_FULL 14
 #define ERR_LOCK_FAILED 15
+#define ERR_INVALID_TAG_TYPE 16
 
 #endif

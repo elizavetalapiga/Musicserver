@@ -113,6 +113,15 @@ void search_tag(int client_fd, const char *command) {
         return;
     }
 
+    if (!(strcasecmp(tag_type, "album") == 0 ||
+        strcasecmp(tag_type, "artist") == 0 ||
+        strcasecmp(tag_type, "year") == 0 ||
+        strcasecmp(tag_type, "genre") == 0)) {
+        response = ERR_INVALID_TAG_TYPE;
+        send(client_fd, &response, sizeof(response), 0);
+        return;
+}
+
      // Send initial OK response
     send(client_fd, &response, sizeof(response), 0);
         printf("[DEBUG] Song count '%d'\n", song_count);
@@ -135,13 +144,12 @@ void search_tag(int client_fd, const char *command) {
         }
     }
 
-    if (found == 0) {
-        response = ERR_TAG_NOT_FOUND;
-        send(client_fd, &response, sizeof(response), 0);
-        return;   
+    if (found == 0) {        
+        dprintf(client_fd, "No songs found with %s: %s\n", tag_type, value);                  
     }               
          
     send(client_fd, "END\n", 4, 0);
+    return;
     
 }
 
@@ -271,11 +279,28 @@ const char* get_genre_name(unsigned char genre) {
     printf("[DEBUG] Updated ID3v1 tag data:\n");
     
     fclose(fp); // Close the file
-    respond = OK; // Success
-    send(client_fd, &respond, sizeof(respond), 0); // Send success response
+    if (changetag_song_in_indexes(filename, &tag) != 0){
+        respond = ERR_GENERIC;
+        send(client_fd, &respond, sizeof(respond), 0);
+        return; // Failed to write updated tag in index
+    } else { 
+        respond = OK; // Success
+        send(client_fd, &respond, sizeof(respond), 0); // Send success response
+    }    
+    
     send(client_fd, &tag, sizeof(tag), 0);      // Send updated tag data back to client
     memset(&tag, 0, sizeof(tag)); // Clear the tag structure to avoid memory leaks
  }
+int changetag_song_in_indexes(const char *filename, const struct ID3v1Tag *new_tag) {
+    for (int i = 0; i < song_count; i++) {
+        if (strcmp(song_index[i].filename, filename) == 0) {
+            song_index[i].tag = *new_tag;  // Overwrite the tag
+            return 0; // Success
+        }
+    }
+    return -1; // Not found
+}
+
 
 
  void index_songs(const char *music_dir) {

@@ -4,8 +4,7 @@ This project is a basic client-server music streaming system written in C, simul
 
 ## Functional Design Choices
 
-- Users can:
-For All Users:
+- For all users and admins:
 - list – List all songs available on the server
 - play <song_name> – Download and play a specific song
 - logout – Log out from the current user session
@@ -154,7 +153,6 @@ extern int song_capacity;
 ## Known Problems
 - No password hashing or encryption is used (plain text credentials).
 - No full validation of metadata fields (e.g., genre number may be out of range).
-- The file system is trusted—no integrity check for song file corruption.
 - All commands are sent as plaintext over TCP; no encryption.
 - SQLite database is accessed without mutexes; not thread-safe under heavy concurrency. However, each child process opens its own SQLite connection to avoid shared state issues.
 - No full validation of metadata fields (e.g., genre number may be out of range).
@@ -183,51 +181,41 @@ extern int song_capacity;
 | Upload as admin   | Admin uploads song                 | File added, index updated            |
 | Upload as user    | Normal user attempts upload         | Permission denied                    |
 | Duplicate upload  | File already exists                | ERR_FILE_EXISTS                      |
-| Interrupted upload| Simulate client/network drop        | Server deletes partial file, returns ERR |
-| Disk full         | Upload exceeds available space      | ERR_DISK_IS_FULL                     |
-| No ID3 tag        | File without ID3v1 tag             | Stored with empty metadata           |
+
 
 ### Download / Play
 | Test Case          | Description                 | Expected Result           |
 |---------------------|-----------------------------|----------------------------|
-| Download song       | Valid file request         | File downloaded            |
-| Download missing    | File not in index          | ERR_FILE_NOT_FOUND         |
-| Play song           | Use system audio player    | Song plays                 |
+| Play song           | Use system audio player    | Download and plays song     |
+| Play song  again    | Use system audio player    | Song plays without downloading|
+| Play uknown song    | File not in index          | ERR_FILE_NOT_FOUND         |
 
 ### Metadata
 | Test Case     | Description               | Expected Result            |
 |----------------|---------------------------|-----------------------------|
 | Info command   | View song metadata        | Title/artist/year shown     |
 | Search by tag  | Search by genre/artist    | Matching songs returned     |
-| Invalid field  | Search by wrong tag type  | ERR_TAG_PARSE_FAIL          |
+| Invalid field  | Search by wrong tag type  | ERR_INVALID_TAG_TYPE          |
+| No match song  | Search by no existent tag value  | No songs found          |
 
 ### Ratings and Stats
 | Test Case         | Description                      | Expected Result                |
 |-------------------|----------------------------------|-------------------------------|
 | Rate song         | User gives rating (1–5)          | Rating saved in DB            |
 | Re-rate song      | User changes rating              | Previous rating updated       |
-| Invalid rating    | Out of bounds rating             | ERR_PARSE or ignored          |
+| Invalid rating    | Out of bounds rating             | ERR Invalid usage          |
 | Get average       | Fetch average rating             | Float value shown             |
-| No ratings yet    | No ratings recorded              | "No ratings yet" message      |
+| No ratings yet    | No ratings recorded              | 0.00 value is shown           |
 | Download count    | Song downloaded many times       | Count matches total           |
 
 ### Admin Functions
 | Test Case          | Description                    | Expected Result               |
 |--------------------|--------------------------------|-------------------------------|
-| Create user        | Admin creates new user         | User added to users.txt       |
+| Create user        | Admin creates new user         | User added to credentials.txt       |
 | Rename song        | Change song filename           | File and index updated        |
 | Delete song        | Remove song from server        | File + DB + index cleaned     |
 | Delete missing song| Try to delete nonexistent song | ERR_FILE_NOT_FOUND            |
-| Change metadata    | Modify album/genre/etc.        | Metadata updated in memory    |
-
-### Error Handling
-| Test Case           | Description                        | Expected Result                  |
-|---------------------|------------------------------------|----------------------------------|
-| Bad DB file         | Corrupted SQLite DB                | Startup/init failure             |
-| DB contention       | Multiple writers (forked clients)  | Busy timeout retries             |
-| Client disconnect   | During upload/download             | Cleanup + ERR sent               |
-| Partial file        | Upload interrupted mid-transfer    | File deleted, resend triggered   |
-| Server shutdown     | SIGINT or crash                    | All resources released safely    |
+| Change metadata    | Modify album/genre/etc.        | Metadata updated and index updated    |
 
 
 ## Instructions for Building and Running
