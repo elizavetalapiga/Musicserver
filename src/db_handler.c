@@ -41,7 +41,7 @@ int rate_song(const char *song, const char *user, int rating) {
 }
 
 float get_average_rating(const char *song) {
-    printf("[DEBUG] Getting average rating for song: %s\n", song); //Debugging output to show which song is being queried
+   
     const char *sql = "SELECT AVG(rating) FROM ratings WHERE song = ?;"; //Using AVG(rating) to compute the average score for a song
     //Prepares the SQL query and binds the song name.
     sqlite3_stmt *stmt;
@@ -54,14 +54,12 @@ float get_average_rating(const char *song) {
         avg = sqlite3_column_double(stmt, 0); // Retrieves the average rating from the result set
     }
 
-    sqlite3_finalize(stmt);
-    printf("[DEBUG] Getting average rating for song: %f\n", avg); 
+    sqlite3_finalize(stmt);     
     return avg;
 }
 
 // DOWNLOAD FUNCTIONS
-int increment_download(const char *song) {
-    printf("[DEBUG] Incrementing download count for song: %s\n", song); //Debugging output to show which song is being incremented
+int increment_download(const char *song) {    
     const char *sql =
         "INSERT INTO downloads (song, count) VALUES (?, 1) " // Inserts a new row with count = 1 if the song does not exist
         "ON CONFLICT(song) DO UPDATE SET count = count + 1;"; // If the song already exists, increments the count by 1
@@ -82,7 +80,6 @@ int get_download_count(const char *song) {
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) return -1;
 
     sqlite3_bind_text(stmt, 1, song, -1, SQLITE_STATIC);
-printf("[DEBUG] Getting download count for song: %s\n", song); //Debugging output to show which song is being queried
     int count = -1;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         count = sqlite3_column_int(stmt, 0);

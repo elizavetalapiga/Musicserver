@@ -20,7 +20,6 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
       // Always allow LOGIN
       if (strncasecmp(command, "LOGIN ", 6) == 0) {
         *logged_in = handle_login(client_fd, command, role, username); // returns 1 if successful
-        printf("[DEBUG] Role: '%s'\n", role);
         return;
     }
 
@@ -72,22 +71,18 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
       return;
       }
     else if (strncasecmp(command, "CHANGETAG ", 10) == 0) {
-      printf("[DEBUG] Entered handle_changetag()\n");
       handle_changetag(client_fd, command, role);
       return;
       }
     else if (strncasecmp(command, "RATE ", 5) == 0) {
-      printf("[DEBUG] User '%s' is trying to rate a song\n", username);
       handle_rate(client_fd, command + 5, username);
       return;
       }
     else if (strncasecmp(command, "AVG ", 4) == 0) {
-      printf("[DEBUG] User '%s' is requesting average rating\n", username);
       handle_avg(client_fd, command + 4);
       return;
       }
     else if (strncasecmp(command, "DLCOUNT ", 8) == 0) {
-      printf("[DEBUG] User '%s' is requesting download count\n", username);
       handle_dlcount(client_fd, command + 8);
       return;
       }
@@ -259,7 +254,6 @@ void handle_add(int client_fd, const char *command, const char *role) {
       send(client_fd, &respond, sizeof(respond), 0);
       return;
   }
-printf("[DEBUG] File size received: %ld bytes\n", filesize);
   if (check_disk_space("music", filesize, &disk_space) == 0){
     respond = ERR_DISK_IS_FULL;
     send(client_fd, &respond, sizeof(respond), 0);
@@ -308,11 +302,9 @@ printf("[DEBUG] File size received: %ld bytes\n", filesize);
       fwrite(buffer, 1, chunk, file);
       received += chunk;
   }
-printf("[DEBUG] Adding file: %s\n", filename);
   fclose(file); // unlocks + closes
 
 
-printf("[DEBUG] File '%s' received, total bytes: %ld\n", filename, received);
 send(client_fd, &respond, sizeof(respond), 0);
 
 }
@@ -339,7 +331,6 @@ void handle_delete(int client_fd, const char *command, const char *role) {
 
   //crafting the filepath
   snprintf(filepath, sizeof(filepath), "music/%s", filename);
-  printf("[DEBUG] Trying to delete: %s\n", filepath);
 
   //removing file, sending the respond
   if (remove(filepath) == 0) {
@@ -400,8 +391,6 @@ if (flock(fd, LOCK_EX) < 0) {
 }
 
 
-printf("[DEBUG] Rename: %s -> %s\n", old_path, new_path);
-
 if (rename(old_path, new_path) == 0) {
     rename_song_in_indexes(old_name, new_name);  // update index too
     respond = OK;
@@ -418,7 +407,6 @@ void handle_newuser(int client_fd, const char *command, const char *role){
 int respond;
 FILE *file;
 char buffer [128], existing_user [64], username [64], password [64], new_role [64];
-printf("[DEBUG] Entered handle_newuser()\n");
 //check for admin role
 if (strcmp(role, "admin") != 0) {
     respond = ERR_PERMISSION;
@@ -432,7 +420,6 @@ if (sscanf(command + 11, "%63s %63s %15s", username, password, new_role) != 3) {
   send(client_fd, &respond, sizeof(respond), 0);
   return;
 }
-printf("[DEBUG] cred chek abs passed()\n");
 new_role[strcspn(new_role, "\n")] = '\0';
 //check id the role is valid
 if (strncasecmp(new_role, "admin", 5) != 0 && strncasecmp(new_role, "user", 4)!= 0){
@@ -456,7 +443,6 @@ while ((fgets(buffer, sizeof(buffer), file)) != NULL){
     return;
   }
 }
-printf("[DEBUG] Creating user: %s %s %s\n", username, password, new_role);
 
 fclose(file);
 
@@ -592,11 +578,9 @@ int remove_song_from_index(const char *filename) {
                 song_index[j] = song_index[j + 1];
             }
             song_count--;
-            printf("[DEBUG] '%s' removed from song_index[]\n", filename);
             return 1;
         }
     }
-    printf("[DEBUG] Song '%s' not found in index.\n", filename);
     return 0;
 }
 

@@ -32,8 +32,6 @@ int client_login(int sock_fd) {
     perror("Login response failed");
     return 0;
   }
-  printf("[DEBUG] Received login response code: %d\n", response);
-
 
   if (response == OK) {
     printf("[Server]: LOGIN OK\n");

@@ -53,8 +53,7 @@ void add_song_to_index(struct SongMetadata *new_song) {
 
 
 // Load ID3v1 tag from an MP3 file safely by reading last 128 bytes
-int read_id3v1_tag(const char *filepath, struct ID3v1Tag *tag) {
-    printf("[DEBUG] Reading ID3v1 tag from file: %s\n", filepath);       
+int read_id3v1_tag(const char *filepath, struct ID3v1Tag *tag) {    
     FILE *fp = fopen(filepath, "rb");
     if (!fp) {
         return 0;
@@ -124,11 +123,9 @@ void search_tag(int client_fd, const char *command) {
 
      // Send initial OK response
     send(client_fd, &response, sizeof(response), 0);
-        printf("[DEBUG] Song count '%d'\n", song_count);
     for (int i = 0; i < song_count; i++) {
         struct ID3v1Tag *tag = &song_index[i].tag;
         int match = 0;
-        printf("[DEBUG] Searching in song: %s\n", song_index[i].filename);
         if (strcasecmp(tag_type, "album") == 0 && strcasecmp(tag->album, value) == 0)
             match = 1;
         else if (strcasecmp(tag_type, "artist") == 0 && strcasecmp(tag->artist, value) == 0)
@@ -140,7 +137,7 @@ void search_tag(int client_fd, const char *command) {
         
         if (match) {
             found = 1;
-            send(client_fd, song_index[i].filename, strlen(song_index[i].filename) + 1, 0);
+            dprintf(client_fd, "%s\n", song_index[i].filename);
         }
     }
 
@@ -174,21 +171,18 @@ const char* get_genre_name(unsigned char genre) {
     char filename[256], tag_type[16], new_value[64];
     char filepath[512];
     struct ID3v1Tag tag;
-    printf("[DEBUG] Role: '%s'\n", role);
     // Check for admin role
     if (strcmp(role, "admin") != 0) {
         respond = ERR_PERMISSION;
         send(client_fd, &respond, sizeof(respond), 0);
         return;
     }
-    printf("[DEBUG] Entered handle_changetag()\n");
     // Parse command to extract filename, tag type and new value
     if (sscanf(command + 10, "%255s %15s %63[^\n]", filename, tag_type, new_value) != 3) {
         respond = ERR_PARSE;
         send(client_fd, &respond, sizeof(respond), 0);
         return;
     }
- printf("[DEBUG] Filename: %s, Tag Type: %s, New Value: %s\n", filename, tag_type, new_value);
     snprintf(filepath, sizeof(filepath), "music/%s", filename);
     
     FILE *fp = fopen(filepath, "rb+"); //open file for updating (read and write)
@@ -197,7 +191,6 @@ const char* get_genre_name(unsigned char genre) {
         send(client_fd, &respond, sizeof(respond), 0);
         return; // File not found or couldn't be opened
     }
-    printf("[DEBUG] Trying to open file: %s\n", filepath);
     // Seek to last 128 bytes (location of ID3v1 tag)
     if (fseek(fp, -ID3V1_TAG_SIZE, SEEK_END) != 0) {
         fclose(fp);
@@ -214,7 +207,6 @@ const char* get_genre_name(unsigned char genre) {
         send(client_fd, &respond, sizeof(respond), 0);
         return;
     }
-    printf("[DEBUG] Read ID3v1 tag from file: %s\n", filepath);
     // Check for the "TAG" identifier
     if (memcmp(buffer, "TAG", 3) != 0) {
         fclose(fp);
@@ -222,7 +214,6 @@ const char* get_genre_name(unsigned char genre) {
         send(client_fd, &respond, sizeof(respond), 0);
         return; // No ID3v1 tag found
     }
-    printf("[DEBUG] Found ID3v1 tag in file: %s\n", filepath);
     // Extract existing tag data
     memset(&tag, 0, sizeof(tag));
     memcpy(tag.title, buffer + 3, ID3V1_TITLE_SIZE);
@@ -234,7 +225,6 @@ const char* get_genre_name(unsigned char genre) {
     memcpy(tag.year, buffer + 93, ID3V1_YEAR_SIZE);
     tag.year[ID3V1_YEAR_SIZE] = '\0';
     tag.genre = buffer[127]; // Read genre byte (last byte of 128-byte ID3v1 tag)
-   printf("[DEBUG] Current ID3v1 tag data:\n");
     // Update the tag based on the tag type
     if (strcasecmp(tag_type, "title") == 0) {
         strncpy(tag.title, new_value, ID3V1_TITLE_SIZE);
@@ -256,7 +246,6 @@ const char* get_genre_name(unsigned char genre) {
         send(client_fd, &respond, sizeof(respond), 0);
         return; // Invalid tag type
     }
-    printf("[DEBUG] Updated ID3v1 tag data:\n");
     printf("Title: %s\n", tag.title);
     printf("Artist: %s\n", tag.artist);
     printf("Album: %s\n", tag.album);
@@ -276,7 +265,7 @@ const char* get_genre_name(unsigned char genre) {
         send(client_fd, &respond, sizeof(respond), 0);
         return; // Failed to write updated tag
     }
-    printf("[DEBUG] Updated ID3v1 tag data:\n");
+
     
     fclose(fp); // Close the file
     if (changetag_song_in_indexes(filename, &tag) != 0){
@@ -304,7 +293,6 @@ int changetag_song_in_indexes(const char *filename, const struct ID3v1Tag *new_t
 
 
  void index_songs(const char *music_dir) {
-    printf("[DEBUG] Indexing songs in directory: %s\n", music_dir);
     DIR *dir = opendir(music_dir);
     struct dirent *entry;
     

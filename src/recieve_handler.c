@@ -124,7 +124,6 @@ int response;
     return;
   }
 
-  printf("[DEBUG] Sending filesize: %ld\n", filesize);
   //building the path
   snprintf(path, sizeof(path), "client_music/%s", filename);
 
@@ -162,7 +161,6 @@ int response;
 void handle_play(const char *filename) {
     char play_cmd[512]; // buffer for the command to play a song
     snprintf(play_cmd, sizeof(play_cmd), "ffplay -nodisp -autoexit \"client_music/%s\"", filename);//crafting the command to play song
-    printf("[DEBUG] Playing file: %s\n", filename);
     system(play_cmd);//system call to execute the command
 }
 
@@ -183,7 +181,6 @@ void handle_snd_add(int sock_fd, const char *filename){
       return;  
     } 
 
-    printf("[DEBUG] Sending file: %s\n", path); 
   state = send_file(sock_fd, path);
   if (state <= 0) {
       printf("Resending the file\n");
@@ -191,7 +188,7 @@ void handle_snd_add(int sock_fd, const char *filename){
       if (state != OK)
           printf("Resending failed\n");
   }
-       printf("[DEBUG] File '%s' sent with state: %d\n", filename, state);
+ 
   return;  
 }
 
@@ -206,13 +203,11 @@ void handle_snd_add(int sock_fd, const char *filename){
        perror("File opening failed");
        return -1;
   } 
-printf("[DEBUG] Sending file2.0: %s\n", filename);
   //filesize collection ans sending in order to stop the loop on client side
   fseek(file, 0, SEEK_END);
   filesize = ftell(file);
   rewind(file); //reset pointer to the begining of file
   send(sock_fd, &filesize, sizeof(filesize), 0);
-printf("[DEBUG] Sending filesize: %ld\n", filesize);
 
   // Sending chunks + Error handeling
   while ((reads_bytes = fread(buffsndr, 1, sizeof(buffsndr), file)) > 0){
@@ -221,7 +216,6 @@ printf("[DEBUG] Sending filesize: %ld\n", filesize);
       return -1;  
     }   
   }
-printf ("[DEBUG] File was sent: %s\n", filename);
   fclose(file);
 
   if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
@@ -255,7 +249,6 @@ printf ("[DEBUG] File was sent: %s\n", filename);
       
   //crafting the filepath
   snprintf(filepath, sizeof(filepath), "client_music/%s", filename);
-  printf("[DEBUG] Trying to delete: %s\n", filepath);
 
   //removing file, sending the respond
   if (remove(filepath) == 0) {
@@ -313,9 +306,8 @@ void handle_rcv_tag(int sock_fd) {
 
 
 void handle_search_response(int sock_fd){
-  char buffer[512] = {0};
+  char buffer[1024] = {0};
   size_t bytes_received;
-  char *end_marker;
   int respond = 0;
 
   if (recv(sock_fd, &respond, sizeof(respond), 0) <= 0) {
@@ -327,27 +319,25 @@ void handle_search_response(int sock_fd){
     return;  // Exit without entering the loop
   }   
 
-  while ((bytes_received = recv(sock_fd, buffer, sizeof(buffer) - 1, 0)) > 0){
-    buffer[bytes_received] = '\0'; // Null-terminate to use printf
-    end_marker = strstr(buffer, "END\n"); // Look for the end marker "END\n"
-    // If the end marker is found, replace it with a null terminator
-    if (end_marker != NULL) {
-      *end_marker = '\0';
-      printf("%s\n", buffer);
-      break;
-    }
+  while ((bytes_received = recv(sock_fd, buffer, sizeof(buffer) - 1, 0)) > 0) {
+      buffer[bytes_received] = '\0';
 
-    printf("%s\n", buffer); 
-     }
-
+      char *line = strtok(buffer, "\n"); // split the buffer into lines
+      while (line != NULL) {
+          if (strcmp(line, "END") == 0) return; // done
+          printf("%s\n", line);
+          line = strtok(NULL, "\n");
+      }
+  }  
     if (bytes_received <= 0) {
         handle_response(ERR_RESPONSE_RECV_FAIL);
     }
 }
+
+
 void handle_rcv_changetag(int sock_fd){
   int response = 0;
   struct ID3v1Tag tag;
-printf("[DEBUG] Entered handle_rcv_changetag()\n");
   // Receive response code
   if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
     handle_response(ERR_RESPONSE_RECV_FAIL);
@@ -389,8 +379,7 @@ void recv_and_print(int sock_fd) {
         handle_response(ERR_RESPONSE_RECV_FAIL);
         exit(EXIT_FAILURE);
     }
-    printf("Debug: Received %d bytes from server.\n", bytes);
-}
+  }
 
 void handle_rcv_rate(int sock_fd) {
     recv_and_print(sock_fd);

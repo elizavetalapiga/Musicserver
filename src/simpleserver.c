@@ -98,7 +98,6 @@ int main(){
               break;
           }
           command[bytes] = '\0';  // Null-terminate it
-          printf("[DEBUG] Received command: '%s'\n", command);
             handle_cmd(client_fd, command, &logged_in, role, username);
           }
 
