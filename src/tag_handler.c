@@ -66,7 +66,7 @@ int read_id3v1_tag(const char *filepath, struct ID3v1Tag *tag) {
     }
 
     // Read tag into buffer
-    unsigned char buffer[ID3V1_TAG_SIZE];
+    unsigned char buffer[ID3V1_TAG_SIZE] = {0};
     if (fread(buffer, 1, ID3V1_TAG_SIZE, fp) != ID3V1_TAG_SIZE) {
         fclose(fp);
         return 0;
@@ -102,7 +102,7 @@ int read_id3v1_tag(const char *filepath, struct ID3v1Tag *tag) {
 
 void search_tag(int client_fd, const char *command) {
     // Expected format: "search <album/artist/year/genre> <value>"
-    char tag_type[16], value[64];
+    char tag_type[16] = {0}, value[64] = {0};
     int response = 0;
     int found = 0;
 
@@ -168,8 +168,8 @@ const char* get_genre_name(unsigned char genre) {
 
  void handle_changetag(int client_fd, const char *command, const char *role){
     int respond = 0;
-    char filename[256], tag_type[16], new_value[64];
-    char filepath[512];
+    char filename[256] = {0}, tag_type[16] = {0}, new_value[64] = {0};
+    char filepath[512] = {0};
     struct ID3v1Tag tag;
     // Check for admin role
     if (strcmp(role, "admin") != 0) {
@@ -200,7 +200,7 @@ const char* get_genre_name(unsigned char genre) {
     }
 
     // Read tag into buffer
-    unsigned char buffer[ID3V1_TAG_SIZE];
+    unsigned char buffer[ID3V1_TAG_SIZE] = {0};
     if (fread(buffer, 1, ID3V1_TAG_SIZE, fp) != ID3V1_TAG_SIZE) {
         fclose(fp);
         respond = ERR_TAG_PARSE_FAIL;
@@ -305,7 +305,7 @@ int changetag_song_in_indexes(const char *filename, const struct ID3v1Tag *new_t
     while ((entry = readdir(dir)) != NULL) {// Read each entry in the directory
     if (strstr(entry->d_name, ".mp3")) {// Check if the file is an MP3
         struct ID3v1Tag tag;
-        char path[512];
+        char path[512] = {0};
         snprintf(path, sizeof(path), "%s/%s", music_dir, entry->d_name);
 
         if (read_id3v1_tag(path, &tag)) {

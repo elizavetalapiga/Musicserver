@@ -10,7 +10,7 @@
 
 
 int client_login(int sock_fd) {
-  char username[64], password[64], login_cmd[150];
+  char username[64] = {0}, password[64] = {0}, login_cmd[150] = {0};
   int response;
 
   // Get user credentials

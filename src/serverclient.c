@@ -8,8 +8,8 @@
 int main() {
   int sock_fd = 0;
   struct  sockaddr_in server_addr;
-  char command[1024], filename[256];
-  char ip[64];
+  char command[1024] = {0}, filename[256] = {0};
+  char ip[64] = {0};
   int port;
 
   if (!load_config(ip, sizeof(ip), &port)) {

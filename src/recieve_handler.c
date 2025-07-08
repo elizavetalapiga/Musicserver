@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/socket.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 void handle_rcv(int sock_fd, const char *command) {
     if (strcasecmp(command, "LIST") == 0) {
@@ -52,10 +55,10 @@ void handle_rcv(int sock_fd, const char *command) {
 }
 
 void handle_rcv_list(int sock_fd) {
-  char buffer[512];
-  char line[512];
+  char buffer[512] = {0};
+  char line[512] = {0};
   size_t line_len = 0;
-  size_t bytes_received;
+  ssize_t bytes_received;
   int respond ;
 
   if (recv(sock_fd, &respond, sizeof(respond), 0) <= 0) {
@@ -69,7 +72,7 @@ void handle_rcv_list(int sock_fd) {
   }   
 
   while ((bytes_received = recv(sock_fd, buffer, sizeof(buffer), 0)) > 0){
-    for (ssize_t i = 0; i < bytes_received; ++i) {
+    for (ssize_t i = 0; i < bytes_received; ++i) { 
             if (buffer[i] == '\n') {
                 line[line_len] = '\0';
                 if (strcmp(line, "END") == 0) return;
@@ -159,13 +162,34 @@ int response;
   }
 
 void handle_play(const char *filename) {
-    char play_cmd[512]; // buffer for the command to play a song
-    snprintf(play_cmd, sizeof(play_cmd), "ffplay -nodisp -autoexit \"client_music/%s\"", filename);//crafting the command to play song
-    system(play_cmd);//system call to execute the command
+    
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        // In child process
+        const char *cmd = "ffplay";
+        char filepath[256] = {0};
+        snprintf(filepath, sizeof(filepath), "client_music/%s", filename);
+
+        char *args[] = {
+            "ffplay", "-nodisp", "-autoexit", filepath, NULL
+        };
+
+        execvp(cmd, args); // run the ffplay with passed arguments, in other words play the song
+
+        // If exec fails
+        perror("execvp failed");
+        _exit(1);
+    } else if (pid > 0) {
+        // In parent: wait for child
+        waitpid(pid, NULL, 0);
+    } else {
+        perror("fork failed");
+    }
 }
 
 void handle_snd_add(int sock_fd, const char *filename){
-  char path[512];
+  char path[512] = {0};
   int response = 0;  
   int state;
    
@@ -196,7 +220,7 @@ void handle_snd_add(int sock_fd, const char *filename){
     size_t reads_bytes;
     int response = 0;
     long filesize;
-    char buffsndr[1024];
+    char buffsndr[1024] = {0};
 
     FILE *file = fopen(filename, "rb");
     if (file == NULL) {
@@ -236,7 +260,7 @@ void handle_snd_add(int sock_fd, const char *filename){
 
   void handle_rcv_delete(int sock_fd, const char *filename) {
     int response = 0;
-    char filepath[512];
+    char filepath[512] = {0};
 
     if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {
     handle_response(ERR_RESPONSE_RECV_FAIL);
@@ -281,7 +305,7 @@ void handle_rcv_newuser(int sock_fd) {
 
 void handle_rcv_tag(int sock_fd) {
     int response = 0;
-    char buffer [512];
+    char buffer [512] = {0};
     
     // Receive response code
     if (recv(sock_fd, &response, sizeof(response), 0) <= 0) {

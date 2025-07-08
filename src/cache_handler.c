@@ -5,7 +5,7 @@
 
 
 int check_cache(const char *filename){
-    char filepath[512];
+    char filepath[512] = {0};
     snprintf(filepath, sizeof(filepath), "client_music/%s", filename);
     
 
@@ -20,7 +20,7 @@ void cleanup_cache(){
     DIR *dir = opendir("client_music");
 
     struct dirent *entry;// Directory entry structure, for selecting only regular files
-    char filepath[512];
+    char filepath[512] = {0};
 
    while ((entry = readdir(dir)) != NULL) {
         // Only delete regular files

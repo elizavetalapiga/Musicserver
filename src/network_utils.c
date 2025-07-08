@@ -46,7 +46,7 @@ int load_config(char *ip_buffer, size_t ip_buf_size, int *port_out) {
         return 0;
     }
 
-    char line[128];
+    char line[128] = {0};
     while (fgets(line, sizeof(line), file)) {
         if (strncmp(line, "IP=", 3) == 0) {
             strncpy(ip_buffer, line + 3, ip_buf_size - 1);

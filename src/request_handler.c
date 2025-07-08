@@ -92,7 +92,7 @@ void handle_cmd(int client_fd, const char *command, int *logged_in, char *role, 
 }
 
 void handle_list(int client_fd){
-  char buffer[512];
+  char buffer [512] = {0};  
   int respond = OK;
 
   send(client_fd, &respond, sizeof(respond), 0);
@@ -107,10 +107,10 @@ void handle_list(int client_fd){
 }
 
 void handle_get (int client_fd, const char *filename) {
-  char buffsndr[1024];
+  char buffsndr[1024] = {0};
   size_t reads_bytes;
-  char local_filename[256];
-  char path[512];
+  char local_filename[256] = {0};
+  char path[512] = {0};
   int respond = 0;
   long filesize = 0;
   // Trim newline, since const was passed we cannot change filename directly
@@ -183,8 +183,8 @@ void handle_get (int client_fd, const char *filename) {
 
 
 int handle_login(int client_fd, const char *command, char *role_out, char *username_out) {
-  char username[64], password[64];
-  char role[64] = "";
+  char username[64] = {0}, password[64] = {0};
+  char role[64] = {0};
   int respond = 0;
   
 
@@ -211,10 +211,10 @@ int handle_login(int client_fd, const char *command, char *role_out, char *usern
 void handle_add(int client_fd, const char *command, const char *role) {
   int respond = 0;
   int fd;
-  char filename[256];
-  char filepath[512];
+  char filename[256] = {0};
+  char filepath[512] = {0};
   long filesize = 0;
-  char buffer[1024];
+  char buffer[1024] = {0};
   long received = 0;
   int chunk;
   long disk_space = 0;
@@ -312,8 +312,8 @@ send(client_fd, &respond, sizeof(respond), 0);
 
 void handle_delete(int client_fd, const char *command, const char *role) {
   int respond = 0;
-  char filename[256];
-  char filepath[512];
+  char filename[256] = {0};
+  char filepath[512] = {0};
   
   //check for admin role
   if (strcmp(role, "admin") != 0) {
@@ -355,7 +355,7 @@ void handle_delete(int client_fd, const char *command, const char *role) {
 void handle_rename(int client_fd, const char *command, const char *role) {
 int respond;
 int fd;
-char old_name [256], new_name [256], old_path [512], new_path [512];
+char old_name [256] = {0}, new_name [256] = {0}, old_path [512] = {0}, new_path [512] = {0};
 
 //check for admin role
 if (strcmp(role, "admin") != 0) {
@@ -406,7 +406,7 @@ close(fd);  // releases lock
 void handle_newuser(int client_fd, const char *command, const char *role){
 int respond;
 FILE *file;
-char buffer [128], existing_user [64], username [64], password [64], new_role [64];
+char buffer [128] = {0}, existing_user [64] = {0}, username [64] = {0}, password [64] = {0}, new_role [64] = {0};
 //check for admin role
 if (strcmp(role, "admin") != 0) {
     respond = ERR_PERMISSION;
@@ -496,7 +496,7 @@ void handle_info(int client_fd, const char *filename) {
 }
 
 void handle_rate(int client_fd, const char *args, const char *user) {
-    char songname[256];
+    char songname[256] = {0};
     int rating;
     
     
@@ -520,7 +520,7 @@ void handle_rate(int client_fd, const char *args, const char *user) {
 
 
 void handle_avg(int client_fd, const char *args) {
-    char songname[256];
+    char songname[256] = {0};
 
     if (sscanf(args, "%255s", songname) != 1) {
         dprintf(client_fd, "ERR Usage: AVG <songname>\n");
@@ -541,7 +541,7 @@ void handle_avg(int client_fd, const char *args) {
 }
 
 void handle_dlcount(int client_fd, const char *args) {
-    char songname[256];
+    char songname[256] = {0};
 
     if (sscanf(args, "%255s", songname) != 1) {
         dprintf(client_fd, "ERR Usage: DLCOUNT <song>\n");

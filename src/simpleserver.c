@@ -13,12 +13,12 @@ int main(){
   struct  sockaddr_in server_addr;
   struct  sockaddr_in client_addr;
   pid_t pid;
-  char command[1024];
+  char command[1024] = {0};
   int logged_in = 0;
   int opt = 1; // Allow socket to be reused
-  char role[64] = "";  // store role for this client
-  char username[64] = "";
-  char ip[64];
+  char role[64] = {0};  // store role for this client
+  char username[64] = {0};
+  char ip[64] = {0};
   int port;
 
  
