@@ -1,11 +1,13 @@
 #include "tag_handler.h"
 #include "response_codes.h"
+#include "semaphore.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <dirent.h>
 #include <stdlib.h>
+#include <sys/sem.h>
 
 
 
@@ -281,12 +283,20 @@ const char* get_genre_name(unsigned char genre) {
     memset(&tag, 0, sizeof(tag)); // Clear the tag structure to avoid memory leaks
  }
 int changetag_song_in_indexes(const char *filename, const struct ID3v1Tag *new_tag) {
+    struct sembuf lock_op = {0, -1, 0};  // P() operation
+    semop(semid, &lock_op, 1);
+
     for (int i = 0; i < song_count; i++) {
         if (strcmp(song_index[i].filename, filename) == 0) {
             song_index[i].tag = *new_tag;  // Overwrite the tag
+            struct sembuf unlock_op = {0, 1, 0};  // V() operation
+            semop(semid, &unlock_op, 1);
             return 0; // Success
         }
     }
+
+    struct sembuf unlock_op = {0, 1, 0};  // V() operation
+    semop(semid, &unlock_op, 1);
     return -1; // Not found
 }
 
@@ -322,3 +332,45 @@ int changetag_song_in_indexes(const char *filename, const struct ID3v1Tag *new_t
 }
     closedir(dir);
 }
+
+int remove_song_from_index(const char *filename) {
+    struct sembuf lock_op = {0, -1, 0};  // P() operation
+    semop(semid, &lock_op, 1);
+
+    for (int i = 0; i < song_count; ++i) {
+        if (strcmp(song_index[i].filename, filename) == 0) {
+            // Shift songs left
+            for (int j = i; j < song_count - 1; ++j) {
+                song_index[j] = song_index[j + 1];
+            }
+            song_count--;
+            struct sembuf unlock_op = {0, 1, 0};  // V() operation
+            semop(semid, &unlock_op, 1);
+            return 1;
+        }
+    }
+    struct sembuf unlock_op = {0, 1, 0};  // V() operation
+    semop(semid, &unlock_op, 1);
+    return 0;
+}
+
+int rename_song_in_indexes(const char *old_filename, const char *new_filename) {
+  struct sembuf lock_op = {0, -1, 0};  // decrement the semaphore with following semop()
+  semop(semid, &lock_op, 1);
+  
+  for (int i = 0; i < song_count; i++) {
+        if (strcmp(song_index[i].filename, old_filename) == 0) {
+            // Found the song, update filename
+            strncpy(song_index[i].filename, new_filename, sizeof(song_index[i].filename) - 1);
+            song_index[i].filename[sizeof(song_index[i].filename) - 1] = '\0'; // null-terminate
+            struct sembuf unlock_op = {0, 1, 0};  // V() operation
+            semop(semid, &unlock_op, 1);
+            return 0; // success
+        }
+    }
+    struct sembuf unlock_op = {0, 1, 0};  // ncrements the semaphore with following semop()
+    semop(semid, &unlock_op, 1);
+    // Not found
+    return -1;
+}
+

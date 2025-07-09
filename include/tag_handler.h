@@ -18,7 +18,6 @@ struct SongMetadata {
     struct ID3v1Tag tag;  
 };
 
-
 extern struct SongMetadata *song_index;  // Declares that indexed songs defined elsewhere
 extern int song_count; //Tracks how many entries are in song_index
 extern int song_capacity;
@@ -32,5 +31,7 @@ void search_tag(int client_fd, const char *command);
 const char* get_genre_name(unsigned char genre);
 void handle_changetag(int client_fd, const char *command, const char *role);
 int changetag_song_in_indexes(const char *filename, const struct ID3v1Tag *new_tag);
- void index_songs(const char *music_dir);
+void index_songs(const char *music_dir);
+int remove_song_from_index(const char *filename);
+int rename_song_in_indexes(const char *old_filename, const char *new_filename);
 #endif 

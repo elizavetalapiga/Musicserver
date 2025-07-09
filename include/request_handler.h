@@ -14,6 +14,5 @@ void handle_rate(int client_fd, const char *args, const char *user);
 void handle_avg(int client_fd, const char *args);
 void handle_dlcount(int client_fd, const char *args);
 int song_exists(const char *songname);
-int remove_song_from_index(const char *filename);
-int rename_song_in_indexes(const char *old_filename, const char *new_filename);
+
 #endif

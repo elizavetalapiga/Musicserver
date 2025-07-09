@@ -13,6 +13,7 @@
 #include <sys/file.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/sem.h>
 
 
 
@@ -562,30 +563,3 @@ int song_exists(const char *songname) {
     return 0;
 }
 
-int remove_song_from_index(const char *filename) {
-    for (int i = 0; i < song_count; ++i) {
-        if (strcmp(song_index[i].filename, filename) == 0) {
-            // Shift songs left
-            for (int j = i; j < song_count - 1; ++j) {
-                song_index[j] = song_index[j + 1];
-            }
-            song_count--;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-int rename_song_in_indexes(const char *old_filename, const char *new_filename) {
-    for (int i = 0; i < song_count; i++) {
-        if (strcmp(song_index[i].filename, old_filename) == 0) {
-            // Found the song, update filename
-            strncpy(song_index[i].filename, new_filename, sizeof(song_index[i].filename) - 1);
-            song_index[i].filename[sizeof(song_index[i].filename) - 1] = '\0'; // null-terminate
-            return 0; // success
-        }
-    }
-
-    // Not found
-    return -1;
-}

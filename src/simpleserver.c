@@ -3,8 +3,8 @@
 #include "network_utils.h"
 #include "request_handler.h"
 #include "tag_handler.h"
-
-
+#include "semaphore.h"
+#include <sys/sem.h>
 
 
 int main(){
@@ -61,6 +61,10 @@ int main(){
 
   init_song_index();  // Allocate the dynamic song index
   index_songs("music");  // This will use add_song_to_index()
+
+  init_semaphore();
+
+
 
   // (1) - in this case run forver
     while (1) {
