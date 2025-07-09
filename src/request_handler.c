@@ -139,22 +139,22 @@ void handle_get (int client_fd, const char *filename) {
       return;
   }
 
-  //checking if the file can be open. RB - Read in Binary Mode, required for mp3
-  FILE *file =  fdopen(fd, "rb");
-  if (!file) {
-    close(fd);
-    respond = ERR_FILE_OPEN_FAIL;
-    send(client_fd, &respond, sizeof(respond), 0); 
-    return;
+
+
+
+  //filesize collection 
+  filesize = lseek(fd, 0, SEEK_END);
+  if (filesize == -1) {
+      close(fd);
+      respond = ERR_GENERIC;
+      send(client_fd, &respond, sizeof(respond), 0);
+      return;
   }
 
   respond = OK;
   send(client_fd, &respond, sizeof(respond), 0);
 
-  //filesize collection ans sending in order to stop the loop on client side
-  fseek(file, 0, SEEK_END);
-  filesize = ftell(file);
-  rewind(file); //reset pointer to the begining of file
+  lseek(fd, 0, SEEK_SET); //reset pointer to the begining of file
   send(client_fd, &filesize, sizeof(filesize), 0);
 
 
@@ -162,13 +162,14 @@ void handle_get (int client_fd, const char *filename) {
   recv(client_fd, &respond, sizeof(respond), 0);
   if (respond != OK) {
   perror("Error occured");
+  close(fd);
   return;
   }
   
   // Sending chunks + Error handeling
-  while ((reads_bytes = fread(buffsndr, 1, sizeof(buffsndr), file)) > 0){
+  while ((reads_bytes = read(fd, buffsndr, sizeof(buffsndr))) > 0){
     if ((send(client_fd, buffsndr, reads_bytes, 0)) == -1){
-    fclose(file); // releases lock and closes fd
+    close(fd); // releases lock and closes fd
     perror("Send failed");
     return;
     }
@@ -176,7 +177,7 @@ void handle_get (int client_fd, const char *filename) {
   }
   //check
   printf("File was sent: %s\n", path);
-  fclose(file);
+  close(fd);
   increment_download(local_filename);
 }
 
@@ -278,31 +279,22 @@ void handle_add(int client_fd, const char *command, const char *role) {
       return;
   }
 
-  //creating file for writing
-  FILE *file = fdopen(fd, "wb");
-  if (!file) {
-      respond = ERR_FILE_OPEN_FAIL;
-      close(fd);
-      send(client_fd, &respond, sizeof(respond), 0);
-      return;
-  }
-
 
  //recieving file
   while (received < filesize) {
       chunk = recv(client_fd, buffer, sizeof(buffer), 0);
       if (chunk <= 0) {// check for failed read or connection closed
         perror("Recieved failed");
-        fclose(file);
+        close(fd);
         remove(filepath);
         respond = ERR_INCOMPLETE_TRANSFER;
         send(client_fd, &respond, sizeof(respond), 0);
         return;        
       }
-      fwrite(buffer, 1, chunk, file);
+      write(fd, buffer, chunk);
       received += chunk;
   }
-  fclose(file); // unlocks + closes
+  close(fd); // unlocks + closes
 
 
 send(client_fd, &respond, sizeof(respond), 0);

@@ -49,6 +49,8 @@ int main() {
       "rate <song_name> <1-5> - rate the song\n"
       "avg <song_name> - rating statisctics\n"
       "dlcount <song_name> - downloading statistics\n"
+      "exit - exit program\n"
+
       "For admin:\n"
       "add <song_name> - upload the song to the server\n"
       "delete <song_name> - delete the song from the server\n"

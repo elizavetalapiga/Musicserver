@@ -181,7 +181,10 @@ void handle_play(const char *filename) {
         perror("execvp failed");
         _exit(1);
     } else if (pid > 0) {
-        // In parent: wait for child
+        printf("Playing: %s\n", filename);
+        printf("Press ENTER to stop playback early...\n");
+        getchar(); // Wait for user input
+        kill(pid, SIGTERM);  // Try to stop playback early
         waitpid(pid, NULL, 0);
     } else {
         perror("fork failed");
