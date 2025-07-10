@@ -21,7 +21,10 @@ int main(){
   char ip[64] = {0};
   int port;
 
- 
+  memset(&server_addr, 0, sizeof(server_addr));
+  memset(&client_addr, 0, sizeof(client_addr));
+
+
 
   if (!load_config(ip, sizeof(ip), &port)) {
       exit(EXIT_FAILURE);
@@ -36,7 +39,7 @@ int main(){
     handle_error("Socket creation failed");
   }
  
-  //Fre port for reuse
+  //Free port for reuse
   setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
   // Bind the socket to an IP and PORT
@@ -55,8 +58,9 @@ int main(){
 
   printf("Server is listening on port %d \n", port);
 
-  // SIGCHLD - Signal that a child process has terminated or changed state; SIG_IGN - Ignore this signal. Against zombi processes
-  signal(SIGCHLD, SIG_IGN);
+  
+  signal(SIGCHLD, SIG_IGN);// SIGCHLD - Signal that a child process has terminated or changed state; SIG_IGN - Ignore this signal. Against zombi processes
+  signal(SIGPIPE, SIG_IGN); // Ignore SIGPIPE to prevent crash on client disconnect
 
 
   init_song_index();  // Allocate the dynamic song index

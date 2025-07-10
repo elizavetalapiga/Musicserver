@@ -23,7 +23,9 @@ int main() {
 
   // Connect to server
   if (connect(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1){
-    printf("Connection failed");
+    printf("Connection failed\n");
+    close(sock_fd);
+    exit(EXIT_FAILURE);
     }
 
   printf("Connected to the server\n");
