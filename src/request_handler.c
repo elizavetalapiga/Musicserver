@@ -327,8 +327,7 @@ void handle_delete(int client_fd, const char *command, const char *role) {
 
   //removing file, sending the respond
   if (remove(filepath) == 0) {
-    respond = OK;
-    send(client_fd, &respond, sizeof(respond), 0);
+    
     if (!delete_song_db_entries(filename)) {
         respond = ERR_GENERIC;
         send(client_fd, &respond, sizeof(respond), 0);
@@ -338,6 +337,8 @@ void handle_delete(int client_fd, const char *command, const char *role) {
         respond = ERR_GENERIC;
         send(client_fd, &respond, sizeof(respond), 0);
     }
+    respond = OK;
+    send(client_fd, &respond, sizeof(respond), 0);
   } else {
     respond = ERR_FILE_NOT_FOUND;
     send(client_fd, &respond, sizeof(respond), 0);
